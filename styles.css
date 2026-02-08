@@ -227,6 +227,30 @@ button[type="submit"]:hover {
     background-color: #c82333;
 }
 
+/* Recipe card list styling */
+.recipe-card ul,
+.recipe-card ol {
+    margin: 10px 0 15px 20px;
+    padding: 0;
+}
+
+.recipe-card li {
+    margin-bottom: 8px;
+    line-height: 1.6;
+}
+
+.recipe-card ul li {
+    list-style-type: disc;
+}
+
+.recipe-card ol li {
+    list-style-type: decimal;
+}
+
+.recipe-card div {
+    margin-bottom: 15px;
+}
+
 /* Responsive Design */
 @media (max-width: 1024px) {
     .container {
