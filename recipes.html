@@ -3,9 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Recipe Keeper</title>
 </head>
 <body>
-    
+     <!-- Header -->
+    <h1>Recipe Keeper</h1>
+
+    <!-- Recipe Input Section -->
+    <h1>Add Recipe</h1>
+    <form>
+        <label for="recipeName">Recipe Name</label>
+        <input type="text" id="recipeName">
+
+        <label for="ingredients">Ingredients</label>
+        <textarea id="ingredients" placeholder="List ingredients separated by commas"></textarea>
+
+        <label for="steps">Steps</label>
+        <textarea id="steps" placeholder="Steps for preparation"></textarea>
+
+        <button type="submit">Add Recipe</button>
+    </form>
+
+    <!-- Recipe Display Area-->
+    <h2>Your Recipes</h2>
+    <div id="recipeDisplay"></div>
 </body>
 </html>
