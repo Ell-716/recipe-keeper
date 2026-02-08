@@ -18,6 +18,14 @@ function displayRecipe(recipe, index) {
     let nameHeading = document.createElement('h3');
     nameHeading.textContent = recipe.name;
 
+    // create and display image if URL is provided
+    if (recipe.imageUrl && recipe.imageUrl.trim() !== '') {
+        let recipeImg = document.createElement('img');
+        recipeImg.src = recipe.imageUrl;
+        recipeImg.alt = recipe.name;
+        recipeDiv.appendChild(recipeImg);
+    }
+
     // create ingredients paragraph
     let ingredientsPara = document.createElement('p');
     ingredientsPara.innerHTML = '<strong>Ingredients:</strong> ' + recipe.ingredients;
@@ -79,12 +87,14 @@ recipeForm.addEventListener('submit', function(event) {
     let enteredRecipeName = recipeName.value;
     let enteredIngredients = ingredients.value;
     let enteredSteps = steps.value;
+    let enteredImageUrl = recipeImage.value;
 
     // create a new recipe
     let newRecipe = {
         name: enteredRecipeName,
         ingredients: enteredIngredients,
-        steps: enteredSteps
+        steps: enteredSteps,
+        imageUrl: enteredImageUrl
     };
 
     // add the new recipe to the recipes array
@@ -97,4 +107,5 @@ recipeForm.addEventListener('submit', function(event) {
     recipeName.value = '';
     ingredients.value = '';
     steps.value = '';
+    recipeImage.value = '';
 });

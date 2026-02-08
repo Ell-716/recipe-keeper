@@ -19,7 +19,7 @@ h1 {
     text-align: center;
     color: #1a1a1a;
     font-size: 3.5rem;
-    margin: 40px 0 10px 0;
+    margin: 10px 0 10px 0;
     font-weight: 400;
     letter-spacing: 2px;
 }
@@ -83,6 +83,7 @@ label {
 }
 
 input[type="text"],
+input[type="url"],
 textarea {
     width: 100%;
     padding: 12px;
@@ -96,6 +97,7 @@ textarea {
 }
 
 input[type="text"]:focus,
+input[type="url"]:focus,
 textarea:focus {
     outline: none;
     border-color: #4a7c59;
@@ -147,13 +149,15 @@ button[type="submit"]:hover {
     font-weight: 400;
     margin-bottom: 20px;
     text-align: center;
-    color: #1a1a1a;
+    color: #4a7c59;
 }
 
 .recipe-card img {
     width: 100%;
     border-radius: 8px;
     margin-bottom: 20px;
+    object-fit: cover;
+    max-height: 300px;
 }
 
 /* Delete button styling */
