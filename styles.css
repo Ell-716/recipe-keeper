@@ -156,6 +156,29 @@ button[type="submit"]:hover {
     margin-bottom: 20px;
 }
 
+/* Delete button styling */
+.delete-button {
+    background-color: #dc3545;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: background-color 0.3s ease;
+}
+
+.delete-button:hover {
+    background-color: #c82333;
+}
+
+.recipe-card p {
+    margin-bottom: 10px;
+    line-height: 1.6;
+}
+
 /* Responsive Design */
 @media (max-width: 1024px) {
     .container {
