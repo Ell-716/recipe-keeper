@@ -8,6 +8,13 @@ let displayArea = document.getElementById('recipeDisplay');
 // Array for Recipes
 let recipes = [];
 
+// Load from Local Storage on page load
+if (localStorage.getItem('recipes')) {
+    recipes = JSON.parse(localStorage.getItem('recipes'));
+    // Display the loaded recipes on the page
+    refreshDisplay();
+}
+
 // Display Function
 function displayRecipe(recipe, index) {
     // create a div for the new recipe
@@ -59,13 +66,11 @@ function deleteRecipe(index) {
     // Remove recipe from the array recipes
     recipes.splice(index, 1);
 
-    // Clear the display area
-    displayArea.innerHTML = '';
+    // Save to Local Storage
+    localStorage.setItem('recipes', JSON.stringify(recipes));
 
-    // Display all recipes again with updated indices
-    recipes.forEach(function(recipe, i) {
-        displayRecipe(recipe, i);
-    });
+    // Refresh the Display
+    refreshDisplay();
 }
 
 // Refresh Display Function (helper to redisplay all recipes)
@@ -99,6 +104,9 @@ recipeForm.addEventListener('submit', function(event) {
 
     // add the new recipe to the recipes array
     recipes.push(newRecipe);
+
+    // Save to Local Storage
+    localStorage.setItem('recipes', JSON.stringify(recipes));
 
     // Refresh the entire display with updated indices
     refreshDisplay();
