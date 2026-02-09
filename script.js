@@ -62,6 +62,28 @@ async function createRecipe(recipeData) {
     }
 }
 
+// API Function: Delete a recipe
+async function deleteRecipeAPI(recipeId) {
+    try {
+        const response = await fetch(`${API_URL}/recipes/${recipeId}`, {
+            method: 'DELETE'
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to delete recipe');
+        }
+        
+        // Refresh recipes from server
+        await fetchRecipes();
+        
+        return true;
+    } catch (error) {
+        console.error('Error deleting recipe:', error);
+        alert('Failed to delete recipe. Please try again.');
+        return false;
+    }
+}
+
 // Function to capitalize recipe name
 function capitalizeRecipeName(name) {
     return name
@@ -196,12 +218,17 @@ function editRecipe(index) {
 }
 
 // Delete Function
-function deleteRecipe(index) {
-    // Remove recipe from the array recipes
-    recipes.splice(index, 1);
-
-    // Refresh the Display
-    refreshDisplay();
+async function deleteRecipe(index) {
+    if (!confirm('Are you sure you want to delete this recipe?')) {
+        return;
+    }
+    
+    // Get the recipe ID
+    let recipe = recipes[index];
+    let recipeId = recipe.id;
+    
+    // Delete via API
+    await deleteRecipeAPI(recipeId);
 }
 
 // Refresh Display Function (helper to redisplay all recipes)
