@@ -13,13 +13,6 @@ let recipes = [];
 let isEditMode = false;
 let editIndex = -1;
 
-// Load from Local Storage on page load
-if (localStorage.getItem('recipes')) {
-    recipes = JSON.parse(localStorage.getItem('recipes'));
-    // Display the loaded recipes on the page
-    refreshDisplay();
-}
-
 // Function to capitalize recipe name
 function capitalizeRecipeName(name) {
     return name
@@ -158,9 +151,6 @@ function deleteRecipe(index) {
     // Remove recipe from the array recipes
     recipes.splice(index, 1);
 
-    // Save to Local Storage
-    localStorage.setItem('recipes', JSON.stringify(recipes));
-
     // Refresh the Display
     refreshDisplay();
 }
@@ -230,12 +220,7 @@ recipeForm.addEventListener('submit', function(event) {
 
         // add the new recipe to the recipes array
         recipes.push(newRecipe);
-
-        console.log('Recipe added:', newRecipe);
     }
-
-    // Save to Local Storage
-    localStorage.setItem('recipes', JSON.stringify(recipes));
 
     // Refresh the entire display with updated indices
     refreshDisplay();
