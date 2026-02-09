@@ -16,8 +16,14 @@ let recipes = [];
 let isEditMode = false;
 let editIndex = -1;
 
+// Show error message
+function showError(message) {
+    displayArea.innerHTML = `<div class="error-message">${message}</div>`;
+}
+
 // API Function: Fetch all recipes
 async function fetchRecipes() {
+    
     try {
         const response = await fetch(`${API_URL}/recipes`);
         
@@ -30,7 +36,7 @@ async function fetchRecipes() {
         refreshDisplay();
     } catch (error) {
         console.error('Error fetching recipes:', error);
-        alert('Failed to load recipes. Please make sure the API server is running at http://localhost:8000');
+        showError('Failed to load recipes. Please make sure the API server is running at http://localhost:8000');
     }
 }
 
@@ -54,6 +60,9 @@ async function createRecipe(recipeData) {
         // Refresh recipes from server
         await fetchRecipes();
         
+        // Show success message
+        alert('Recipe added successfully!');
+        
         return newRecipe;
     } catch (error) {
         console.error('Error creating recipe:', error);
@@ -75,6 +84,9 @@ async function deleteRecipeAPI(recipeId) {
         
         // Refresh recipes from server
         await fetchRecipes();
+        
+        // Show success message
+        alert('Recipe deleted successfully!');
         
         return true;
     } catch (error) {
@@ -101,6 +113,9 @@ async function updateRecipeAPI(recipeId, recipeData) {
         
         // Refresh recipes from server
         await fetchRecipes();
+        
+        // Show success message
+        alert('Recipe updated successfully!');
         
         return await response.json();
     } catch (error) {
@@ -323,36 +338,6 @@ recipeForm.addEventListener('submit', async function(event) {
     // Reset the form
     resetForm();
 });
-
-// Show loading state
-function showLoading() {
-    displayArea.innerHTML = '<div class="loading">Loading recipes...</div>';
-}
-
-// Show error message
-function showError(message) {
-    displayArea.innerHTML = `<div class="error-message">${message}</div>`;
-}
-
-// Update fetchRecipes with loading state
-async function fetchRecipes() {
-    showLoading();
-    
-    try {
-        const response = await fetch(`${API_URL}/recipes`);
-        
-        if (!response.ok) {
-            throw new Error('Failed to fetch recipes');
-        }
-        
-        const data = await response.json();
-        recipes = data;
-        refreshDisplay();
-    } catch (error) {
-        console.error('Error fetching recipes:', error);
-        showError('Failed to load recipes. Please make sure the API server is running at http://localhost:8000');
-    }
-}
 
 // Load recipes when page loads
 window.addEventListener('DOMContentLoaded', function() {
