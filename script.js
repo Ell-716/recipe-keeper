@@ -6,6 +6,9 @@ let steps = document.getElementById('steps');
 let recipeImage = document.getElementById('recipeImage');
 let displayArea = document.getElementById('recipeDisplay');
 let searchInput = document.getElementById('searchInput');
+let sortButton = document.getElementById('sortButton');
+let sortMenu = document.getElementById('sortMenu');
+let currentSort = 'name-asc';
 
 // Array for Recipes
 let recipes = [];
@@ -13,6 +16,9 @@ let recipes = [];
 // Track if we're in edit mode
 let isEditMode = false;
 let editIndex = -1;
+
+// Track comment counts for sorting
+let commentCounts = {};
 
 // Show error message
 function showError(message) {
@@ -24,13 +30,60 @@ function showNoResults() {
     displayArea.innerHTML = '<div class="no-results">No recipes found matching your search.</div>';
 }
 
+// Sort recipes based on selected option
+function sortRecipes(recipesToSort) {
+    const sortOption = currentSort;
+    let sorted = [...recipesToSort]; // Create a copy
+    
+    switch(sortOption) {
+        case 'name-asc':
+            sorted.sort((a, b) => a.name.localeCompare(b.name));
+            break;
+        case 'name-desc':
+            sorted.sort((a, b) => b.name.localeCompare(a.name));
+            break;
+        case 'date-newest':
+            sorted.sort((a, b) => b.id - a.id);
+            break;
+        case 'date-oldest':
+            sorted.sort((a, b) => a.id - b.id);
+            break;
+        case 'comments-most':
+            sorted.sort((a, b) => {
+                const aCount = commentCounts[a.id] || 0;
+                const bCount = commentCounts[b.id] || 0;
+                return bCount - aCount;
+            });
+            break;
+    }
+    
+    return sorted;
+}
+
 // Load and display recipes (with optional search)
 async function loadRecipes(searchQuery = '') {
     try {
         recipes = await fetchRecipes(searchQuery);
+        
+        // Load comment counts for all recipes
+        await loadAllCommentCounts();
+        
         refreshDisplay();
     } catch (error) {
         showError('Failed to load recipes. Please make sure the API server is running at http://localhost:8000');
+    }
+}
+
+// Load comment counts for all recipes
+async function loadAllCommentCounts() {
+    commentCounts = {};
+    for (let recipe of recipes) {
+        try {
+            const comments = await getComments(recipe.id);
+            commentCounts[recipe.id] = comments.length;
+        } catch (error) {
+            commentCounts[recipe.id] = 0;
+        }
     }
 }
 
@@ -93,13 +146,13 @@ async function displayRecipe(recipe, index) {
     commentIconContainer.innerHTML = '<img src="chat.png" alt="Comments" style="width: 24px; height: 24px;">';
     commentIconContainer.title = 'View comments';
     
-    // Get comment count
-    const comments = await getComments(recipe.id);
-    if (comments.length > 0) {
-        let commentCount = document.createElement('span');
-        commentCount.classList.add('comment-count');
-        commentCount.textContent = comments.length;
-        commentIconContainer.appendChild(commentCount);
+    // Use cached comment count
+    const commentCount = commentCounts[recipe.id] || 0;
+    if (commentCount > 0) {
+        let commentCountBadge = document.createElement('span');
+        commentCountBadge.classList.add('comment-count');
+        commentCountBadge.textContent = commentCount;
+        commentIconContainer.appendChild(commentCountBadge);
     }
     
     commentIconContainer.onclick = function() {
@@ -269,6 +322,9 @@ async function handleAddComment(recipeId, authorInput, commentTextarea, modal) {
         const commentsList = document.getElementById(`modal-comments-list-${recipeId}`);
         await loadCommentsInModal(recipeId, commentsList);
 
+        // Update comment count
+        commentCounts[recipeId] = (commentCounts[recipeId] || 0) + 1;
+
         alert('Comment added successfully!');
     } catch (error) {
         alert('Failed to add comment. Please try again.');
@@ -286,6 +342,9 @@ async function handleDeleteComment(commentId, recipeId, commentsList) {
 
         // Reload comments
         await loadCommentsInModal(recipeId, commentsList);
+
+        // Update comment count
+        commentCounts[recipeId] = Math.max((commentCounts[recipeId] || 1) - 1, 0);
 
         alert('Comment deleted successfully!');
     } catch (error) {
@@ -357,9 +416,14 @@ async function refreshDisplay() {
         return;
     }
 
-    // Display recipes with their current index
-    for (let i = 0; i < recipes.length; i++) {
-        await displayRecipe(recipes[i], i);
+    // Sort recipes
+    const sortedRecipes = sortRecipes(recipes);
+
+    // Display sorted recipes
+    for (let i = 0; i < sortedRecipes.length; i++) {
+        // Find original index for edit/delete operations
+        const originalIndex = recipes.findIndex(r => r.id === sortedRecipes[i].id);
+        await displayRecipe(sortedRecipes[i], originalIndex);
     }
 }
 
@@ -447,6 +511,39 @@ searchInput.addEventListener('input', function() {
         const searchQuery = searchInput.value;
         loadRecipes(searchQuery);
     }, 300); // Wait 300ms after user stops typing
+});
+
+/// Sort Button and Menu Event Listeners
+sortButton.addEventListener('click', function(e) {
+    e.stopPropagation();
+    sortMenu.style.display = sortMenu.style.display === 'none' ? 'block' : 'none';
+});
+
+// Close menu when clicking outside
+document.addEventListener('click', function(e) {
+    if (!sortButton.contains(e.target) && !sortMenu.contains(e.target)) {
+        sortMenu.style.display = 'none';
+    }
+});
+
+// Handle sort option clicks
+document.querySelectorAll('.sort-option').forEach(option => {
+    option.addEventListener('click', function() {
+        // Remove active class from all options
+        document.querySelectorAll('.sort-option').forEach(opt => opt.classList.remove('active'));
+        
+        // Add active class to selected option
+        this.classList.add('active');
+        
+        // Update current sort
+        currentSort = this.getAttribute('data-sort');
+        
+        // Hide menu
+        sortMenu.style.display = 'none';
+        
+        // Refresh display with new sort
+        refreshDisplay();
+    });
 });
 
 // Load recipes when page loads

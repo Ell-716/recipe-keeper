@@ -12,6 +12,16 @@
 
     <!-- Search Bar - Top Right -->
     <input type="text" id="searchInput" placeholder="Search recipes..." style="background-image: url('search.png'); background-repeat: no-repeat; background-position: 10px center; background-size: 18px; padding-left: 35px;">
+    <button id="sortButton" class="sort-icon-button">
+        <img src="filter.png" alt="Sort" style="width: 24px; height: 24px;">
+    </button>
+    <div id="sortMenu" class="sort-menu" style="display: none;">
+        <div class="sort-option" data-sort="name-asc">Name (A-Z)</div>
+        <div class="sort-option" data-sort="name-desc">Name (Z-A)</div>
+        <div class="sort-option" data-sort="date-newest">Newest First</div>
+        <div class="sort-option" data-sort="date-oldest">Oldest First</div>
+        <div class="sort-option" data-sort="comments-most">Most Comments</div>
+    </div>
 
     <!-- Two Column Container -->
     <div class="container">

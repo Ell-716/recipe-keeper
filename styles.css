@@ -432,9 +432,9 @@ button[type="submit"]:hover {
 #searchInput {
     position: absolute;
     top: 15px;
-    right: 35px;
-    width: 250px;
-    padding: 10px 15px;
+    right: 60px;
+    width: 200px;
+    padding: 10px 10px;
     border: 1px solid #d0d0d0;
     border-radius: 25px;
     font-family: 'Arial', sans-serif;
@@ -449,6 +449,64 @@ button[type="submit"]:hover {
     outline: none;
     border-color: #4a7c59;
     box-shadow: 0 2px 12px rgba(74, 124, 89, 0.2);
+}
+
+/* Sort icon button */
+.sort-icon-button {
+    position: absolute;
+    top: 25px;
+    right: 30px;
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    z-index: 10;
+}
+
+.sort-icon-button:hover {
+    border-color: #4a7c59;
+    box-shadow: 0 2px 12px rgba(74, 124, 89, 0.2);
+    transform: scale(1.1);
+}
+
+/* Sort dropdown menu */
+.sort-menu {
+    position: absolute;
+    top: 65px;
+    right: 30px;
+    background-color: #fff;
+    border: 1px solid #d0d0d0;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+    min-width: 180px;
+}
+
+.sort-option {
+    padding: 5px 20px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    font-family: 'Arial', sans-serif;
+    font-size: 0.95rem;
+    color: #333;
+}
+
+.sort-option:first-child {
+    border-radius: 8px 8px 0 0;
+}
+
+.sort-option:last-child {
+    border-radius: 0 0 8px 8px;
+}
+
+.sort-option:hover {
+    background-color: #f0f0f0;
+}
+
+.sort-option.active {
+    background-color: #4a7c59;
+    color: white;
 }
 
 /* Responsive Design */
