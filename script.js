@@ -6,12 +6,35 @@ let steps = document.getElementById('steps');
 let recipeImage = document.getElementById('recipeImage');
 let displayArea = document.getElementById('recipeDisplay');
 
+// API Configuration
+const API_URL = 'http://localhost:8000';
+
 // Array for Recipes
 let recipes = [];
 
 // Track if we're in edit mode
 let isEditMode = false;
 let editIndex = -1;
+
+// API Function: Fetch all recipes
+async function fetchRecipes() {
+    try {
+        const response = await fetch(`${API_URL}/recipes`);
+        
+        if (!response.ok) {
+            throw new Error('Failed to fetch recipes');
+        }
+        
+        const data = await response.json();
+        recipes = data;
+        refreshDisplay();
+        
+        console.log('Recipes fetched:', recipes);
+    } catch (error) {
+        console.error('Error fetching recipes:', error);
+        alert('Failed to load recipes. Please make sure the API server is running at http://localhost:8000');
+    }
+}
 
 // Function to capitalize recipe name
 function capitalizeRecipeName(name) {
@@ -227,4 +250,10 @@ recipeForm.addEventListener('submit', function(event) {
 
     // Reset the form
     resetForm();
+
+});
+
+// Load recipes when page loads
+window.addEventListener('DOMContentLoaded', function() {
+    fetchRecipes();
 });
