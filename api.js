@@ -85,3 +85,59 @@ async function deleteRecipe(recipeId) {
         throw error;
     }
 }
+
+// API Function: Get comments for a recipe
+async function getComments(recipeId) {
+    try {
+        const response = await fetch(`${API_URL}/recipes/${recipeId}/comments`);
+        
+        if (!response.ok) {
+            throw new Error('Failed to fetch comments');
+        }
+        
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching comments:', error);
+        throw error;
+    }
+}
+
+// API Function: Add a comment to a recipe
+async function addComment(recipeId, commentData) {
+    try {
+        const response = await fetch(`${API_URL}/recipes/${recipeId}/comments`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(commentData)
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to add comment');
+        }
+        
+        return await response.json();
+    } catch (error) {
+        console.error('Error adding comment:', error);
+        throw error;
+    }
+}
+
+// API Function: Delete a comment
+async function deleteComment(commentId) {
+    try {
+        const response = await fetch(`${API_URL}/comments/${commentId}`, {
+            method: 'DELETE'
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to delete comment');
+        }
+        
+        return true;
+    } catch (error) {
+        console.error('Error deleting comment:', error);
+        throw error;
+    }
+}

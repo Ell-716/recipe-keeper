@@ -12,6 +12,7 @@ body {
     padding: 20px;
     max-width: 1400px;
     margin: 0 auto;
+    position: relative;
 }
 
 /* Background image */
@@ -177,71 +178,9 @@ button[type="submit"]:hover {
     max-height: 300px;
 }
 
-/* Delete button styling */
-.delete-button {
-    background-color: #dc3545;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    cursor: pointer;
-    margin-top: 15px;
-    transition: background-color 0.3s ease;
-}
-
-.delete-button:hover {
-    background-color: #c82333;
-}
-
 .recipe-card p {
     margin-bottom: 10px;
     line-height: 1.6;
-}
-
-/* Button container for Edit and Delete buttons */
-.button-container {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
-}
-
-/* Edit button styling */
-.edit-button {
-    background-color: #4a7c59;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    cursor: pointer;
-    flex: 1;
-    transition: background-color 0.3s ease;
-}
-
-.edit-button:hover {
-    background-color: #2c5f2d;
-}
-
-/* Update delete button to work in flex container */
-.delete-button {
-    background-color: #dc3545;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    cursor: pointer;
-    margin-top: 0;
-    flex: 1;
-    transition: background-color 0.3s ease;
-}
-
-.delete-button:hover {
-    background-color: #c82333;
 }
 
 /* Recipe card list styling */
@@ -268,6 +207,209 @@ button[type="submit"]:hover {
     margin-bottom: 15px;
 }
 
+/* Icon buttons for Edit, Delete, and Comments */
+.action-icons {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+    justify-content: flex-end;
+}
+
+.icon-button {
+    background-color: transparent;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 8px;
+    transition: transform 0.2s ease;
+    width: auto;
+    position: relative;
+}
+
+.icon-button:hover {
+    transform: scale(1.2);
+}
+
+.edit-icon {
+    color: #4a7c59;
+}
+
+.delete-icon {
+    color: #dc3545;
+}
+
+.comment-icon {
+    color: #4a7c59;
+    position: relative;
+}
+
+.comment-count {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #dc3545;
+    color: white;
+    border-radius: 50%;
+    font-size: 0.7rem;
+    padding: 2px 5px;
+    min-width: 18px;
+    text-align: center;
+    font-family: 'Arial', sans-serif;
+}
+
+/* Comments dropdown/modal */
+.comments-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.comments-modal-content {
+    background-color: white;
+    padding: 30px;
+    border-radius: 12px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.comments-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #4a7c59;
+}
+
+.comments-modal-header h3 {
+    color: #4a7c59;
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.close-modal {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: #666;
+    padding: 0;
+    width: auto;
+    line-height: 1;
+}
+
+.close-modal:hover {
+    color: #333;
+}
+
+/* Comment form */
+.comment-form {
+    margin-bottom: 25px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+}
+
+.comment-form input,
+.comment-form textarea {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 12px;
+    border: 1px solid #d0d0d0;
+    border-radius: 6px;
+    font-family: 'Arial', sans-serif;
+    font-size: 0.95rem;
+}
+
+.comment-form input {
+    height: 45px;
+}
+
+.comment-form textarea {
+    height: 80px;
+    resize: vertical;
+}
+
+.comment-form button {
+    background-color: #4a7c59;
+    color: white;
+    padding: 10px 25px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: auto;
+}
+
+.comment-form button:hover {
+    background-color: #2c5f2d;
+}
+
+/* Comments list */
+.comments-list {
+    margin-top: 20px;
+}
+
+.comment-item {
+    background-color: #f9f9f9;
+    padding: 15px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    border-left: 4px solid #4a7c59;
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.comment-author {
+    font-weight: 600;
+    color: #4a7c59;
+    font-size: 1rem;
+}
+
+.comment-delete-icon {
+    background: none;
+    border: none;
+    color: #dc3545;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 5px;
+    width: auto;
+}
+
+.comment-delete-icon:hover {
+    color: #c82333;
+}
+
+.comment-text {
+    color: #333;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.no-comments {
+    color: #999;
+    font-style: italic;
+    font-size: 0.95rem;
+    text-align: center;
+    padding: 20px;
+}
+
 /* Loading indicator */
 .loading {
     text-align: center;
@@ -286,10 +428,11 @@ button[type="submit"]:hover {
     text-align: center;
 }
 
+/* Search input */
 #searchInput {
     position: absolute;
     top: 15px;
-    right: 180px;
+    right: 35px;
     width: 250px;
     padding: 10px 15px;
     border: 1px solid #d0d0d0;
