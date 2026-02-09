@@ -28,11 +28,37 @@ async function fetchRecipes() {
         const data = await response.json();
         recipes = data;
         refreshDisplay();
-        
-        console.log('Recipes fetched:', recipes);
     } catch (error) {
         console.error('Error fetching recipes:', error);
         alert('Failed to load recipes. Please make sure the API server is running at http://localhost:8000');
+    }
+}
+
+// API Function: Create a new recipe
+async function createRecipe(recipeData) {
+    try {
+        const response = await fetch(`${API_URL}/recipes`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(recipeData)
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to create recipe');
+        }
+        
+        const newRecipe = await response.json();
+        
+        // Refresh recipes from server
+        await fetchRecipes();
+        
+        return newRecipe;
+    } catch (error) {
+        console.error('Error creating recipe:', error);
+        alert('Failed to add recipe. Please try again.');
+        return null;
     }
 }
 
@@ -204,7 +230,7 @@ function resetForm() {
 }
 
 // Set Up the Event Listener
-recipeForm.addEventListener('submit', function(event) {
+recipeForm.addEventListener('submit', async function(event) {
     event.preventDefault();
 
     // Capture Input Values
@@ -223,7 +249,7 @@ recipeForm.addEventListener('submit', function(event) {
     enteredRecipeName = capitalizeRecipeName(enteredRecipeName);
 
     if (isEditMode) {
-        // Update existing recipe
+        // Update existing recipe (will implement API call in next step)
         recipes[editIndex] = {
             name: enteredRecipeName,
             ingredients: enteredIngredients,
@@ -231,26 +257,21 @@ recipeForm.addEventListener('submit', function(event) {
             imageUrl: enteredImageUrl
         };
 
-        console.log('Recipe updated:', recipes[editIndex]);
+        refreshDisplay();
     } else {
-        // Create new recipe
-        let newRecipe = {
+        // Create new recipe via API
+        const recipeData = {
             name: enteredRecipeName,
             ingredients: enteredIngredients,
             steps: enteredSteps,
             imageUrl: enteredImageUrl
         };
 
-        // add the new recipe to the recipes array
-        recipes.push(newRecipe);
+        await createRecipe(recipeData);
     }
-
-    // Refresh the entire display with updated indices
-    refreshDisplay();
 
     // Reset the form
     resetForm();
-
 });
 
 // Load recipes when page loads
