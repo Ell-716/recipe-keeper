@@ -6,9 +6,6 @@ let steps = document.getElementById('steps');
 let recipeImage = document.getElementById('recipeImage');
 let displayArea = document.getElementById('recipeDisplay');
 
-// API Configuration
-const API_URL = 'http://localhost:8000';
-
 // Array for Recipes
 let recipes = [];
 
@@ -21,154 +18,14 @@ function showError(message) {
     displayArea.innerHTML = `<div class="error-message">${message}</div>`;
 }
 
-// API Function: Fetch all recipes
-async function fetchRecipes() {
-    
+// Load and display recipes
+async function loadRecipes() {
     try {
-        const response = await fetch(`${API_URL}/recipes`);
-        
-        if (!response.ok) {
-            throw new Error('Failed to fetch recipes');
-        }
-        
-        const data = await response.json();
-        recipes = data;
+        recipes = await fetchRecipes();
         refreshDisplay();
     } catch (error) {
-        console.error('Error fetching recipes:', error);
         showError('Failed to load recipes. Please make sure the API server is running at http://localhost:8000');
     }
-}
-
-// API Function: Create a new recipe
-async function createRecipe(recipeData) {
-    try {
-        const response = await fetch(`${API_URL}/recipes`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(recipeData)
-        });
-        
-        if (!response.ok) {
-            throw new Error('Failed to create recipe');
-        }
-        
-        const newRecipe = await response.json();
-        
-        // Refresh recipes from server
-        await fetchRecipes();
-        
-        // Show success message
-        alert('Recipe added successfully!');
-        
-        return newRecipe;
-    } catch (error) {
-        console.error('Error creating recipe:', error);
-        alert('Failed to add recipe. Please try again.');
-        return null;
-    }
-}
-
-// API Function: Delete a recipe
-async function deleteRecipeAPI(recipeId) {
-    try {
-        const response = await fetch(`${API_URL}/recipes/${recipeId}`, {
-            method: 'DELETE'
-        });
-        
-        if (!response.ok) {
-            throw new Error('Failed to delete recipe');
-        }
-        
-        // Refresh recipes from server
-        await fetchRecipes();
-        
-        // Show success message
-        alert('Recipe deleted successfully!');
-        
-        return true;
-    } catch (error) {
-        console.error('Error deleting recipe:', error);
-        alert('Failed to delete recipe. Please try again.');
-        return false;
-    }
-}
-
-// API Function: Update a recipe
-async function updateRecipeAPI(recipeId, recipeData) {
-    try {
-        const response = await fetch(`${API_URL}/recipes/${recipeId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(recipeData)
-        });
-        
-        if (!response.ok) {
-            throw new Error('Failed to update recipe');
-        }
-        
-        // Refresh recipes from server
-        await fetchRecipes();
-        
-        // Show success message
-        alert('Recipe updated successfully!');
-        
-        return await response.json();
-    } catch (error) {
-        console.error('Error updating recipe:', error);
-        alert('Failed to update recipe. Please try again.');
-        return null;
-    }
-}
-
-// Function to capitalize recipe name
-function capitalizeRecipeName(name) {
-    return name
-        .toLowerCase()
-        .split(' ')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ');
-}
-
-// Function to format ingredients as list
-function formatIngredientsList(ingredientsText) {
-    // Split by commas or newlines
-    let ingredientsArray = ingredientsText
-        .split(/[,\n]/)
-        .map(item => item.trim())
-        .filter(item => item.length > 0);
-    
-    // Create HTML list
-    let listHTML = '<strong>Ingredients:</strong><ul>';
-    ingredientsArray.forEach(ingredient => {
-        listHTML += '<li>' + ingredient + '</li>';
-    });
-    listHTML += '</ul>';
-    
-    return listHTML;
-}
-
-// Function to format steps as numbered list
-function formatStepsList(stepsText) {
-    // Split by newlines or numbered patterns
-    let stepsArray = stepsText
-        .split(/\n/)
-        .map(item => item.trim())
-        .map(item => item.replace(/^\d+\.\s*/, '')) // Remove existing numbers
-        .filter(item => item.length > 0);
-    
-    // Create HTML numbered list
-    let listHTML = '<strong>Steps:</strong><ol>';
-    stepsArray.forEach(step => {
-        listHTML += '<li>' + step + '</li>';
-    });
-    listHTML += '</ol>';
-    
-    return listHTML;
 }
 
 // Display Function
@@ -218,7 +75,7 @@ function displayRecipe(recipe, index) {
 
     // add an event handler for delete
     deleteButton.onclick = function() {
-        deleteRecipe(index);
+        handleDeleteRecipe(index);
     };
 
     // append buttons to container
@@ -259,17 +116,27 @@ function editRecipe(index) {
 }
 
 // Delete Function
-async function deleteRecipe(index) {
+async function handleDeleteRecipe(index) {
     if (!confirm('Are you sure you want to delete this recipe?')) {
         return;
     }
     
-    // Get the recipe ID
-    let recipe = recipes[index];
-    let recipeId = recipe.id;
-    
-    // Delete via API
-    await deleteRecipeAPI(recipeId);
+    try {
+        // Get the recipe ID
+        let recipe = recipes[index];
+        let recipeId = recipe.id;
+        
+        // Delete via API
+        await deleteRecipe(recipeId);
+        
+        // Refresh recipes from server
+        await loadRecipes();
+        
+        // Show success message
+        alert('Recipe deleted successfully!');
+    } catch (error) {
+        alert('Failed to delete recipe. Please try again.');
+    }
 }
 
 // Refresh Display Function (helper to redisplay all recipes)
@@ -308,8 +175,9 @@ recipeForm.addEventListener('submit', async function(event) {
     let enteredImageUrl = recipeImage.value.trim();
 
     // Validation
-    if (!enteredRecipeName || !enteredIngredients || !enteredSteps || !enteredImageUrl) {
-        alert('Please fill in all required fields (Recipe Name, Ingredients, Steps and Image URL)');
+    const validation = validateRecipeData(enteredRecipeName, enteredIngredients, enteredSteps, enteredImageUrl);
+    if (!validation.valid) {
+        alert(validation.message);
         return;
     }
 
@@ -324,22 +192,38 @@ recipeForm.addEventListener('submit', async function(event) {
         imageUrl: enteredImageUrl
     };
 
-    if (isEditMode) {
-        // Update existing recipe via API
-        let recipe = recipes[editIndex];
-        let recipeId = recipe.id;
-        
-        await updateRecipeAPI(recipeId, recipeData);
-    } else {
-        // Create new recipe via API
-        await createRecipe(recipeData);
-    }
+    try {
+        if (isEditMode) {
+            // Update existing recipe via API
+            let recipe = recipes[editIndex];
+            let recipeId = recipe.id;
+            
+            await updateRecipe(recipeId, recipeData);
+            
+            // Refresh recipes from server
+            await loadRecipes();
+            
+            // Show success message
+            alert('Recipe updated successfully!');
+        } else {
+            // Create new recipe via API
+            await createRecipe(recipeData);
+            
+            // Refresh recipes from server
+            await loadRecipes();
+            
+            // Show success message
+            alert('Recipe added successfully!');
+        }
 
-    // Reset the form
-    resetForm();
+        // Reset the form
+        resetForm();
+    } catch (error) {
+        alert('Failed to save recipe. Please try again.');
+    }
 });
 
 // Load recipes when page loads
 window.addEventListener('DOMContentLoaded', function() {
-    fetchRecipes();
+    loadRecipes();
 });
