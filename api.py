@@ -1,7 +1,7 @@
 """
 API for Recipe Keeper Application.
 
-This module provides endpoints for CRUD operations on recipes.
+This module provides endpoints for CRUD operations on recipes and comments.
 It uses a JSON file for storage, and FastAPI for the web server.
 """
 
@@ -25,6 +25,7 @@ app.add_middleware(
 )
 
 RECIPES_FILE = "recipes.json"
+COMMENTS_FILE = "comments.json"
 
 
 def load_recipes():
@@ -54,6 +55,33 @@ def save_recipes(recipes):
         json.dump(recipes, file)
 
 
+def load_comments():
+    """
+    Load comments from JSON file into memory.
+
+    If the JSON file does not exist, it initializes an empty list.
+
+    Returns:
+        list: A list of comments.
+    """
+    if not os.path.exists(COMMENTS_FILE):
+        save_comments([])
+
+    with open(COMMENTS_FILE, "r") as file:
+        return json.load(file)
+
+
+def save_comments(comments):
+    """
+    Save the current state of comments into JSON file.
+
+    Args:
+        comments (list): List of comments to save.
+    """
+    with open(COMMENTS_FILE, "w") as file:
+        json.dump(comments, file)
+
+
 class Recipe(BaseModel):
     """Recipe Model.
 
@@ -69,6 +97,21 @@ class Recipe(BaseModel):
     ingredients: str
     steps: str
     imageUrl: str = ""
+
+
+class Comment(BaseModel):
+    """Comment Model.
+
+    Attributes:
+        id (int): Comment identifier.
+        recipe_id (int): ID of the recipe this comment belongs to.
+        author (str): Name of the comment author.
+        text (str): Comment text.
+    """
+    id: int = None
+    recipe_id: int
+    author: str
+    text: str
 
 
 @app.get("/recipes")
@@ -184,7 +227,79 @@ def delete_recipe(recipe_id: int):
 
     del recipes[recipe_index]
     save_recipes(recipes)
+    
+    # Also delete all comments for this recipe
+    comments = load_comments()
+    comments = [c for c in comments if c["recipe_id"] != recipe_id]
+    save_comments(comments)
+    
     return {"status": "success", "message": "Recipe deleted successfully"}
+
+
+# Comment endpoints
+@app.get("/recipes/{recipe_id}/comments")
+def get_comments(recipe_id: int):
+    """Get all comments for a specific recipe.
+
+    Args:
+        recipe_id (int): ID of the recipe.
+
+    Returns:
+        list: List of comments for the recipe.
+    """
+    comments = load_comments()
+    recipe_comments = [c for c in comments if c["recipe_id"] == recipe_id]
+    return recipe_comments
+
+
+@app.post("/recipes/{recipe_id}/comments")
+def add_comment(recipe_id: int, comment: Comment):
+    """Add a comment to a recipe.
+
+    Args:
+        recipe_id (int): ID of the recipe.
+        comment (Comment): Comment data.
+
+    Returns:
+        dict: The created comment.
+    """
+    # Verify recipe exists
+    recipes = load_recipes()
+    recipe = next((r for r in recipes if r["id"] == recipe_id), None)
+    if recipe is None:
+        raise HTTPException(status_code=404, detail="Recipe not found")
+    
+    comments = load_comments()
+    comment_id = max((c["id"] for c in comments), default=0) + 1
+    comment.id = comment_id
+    comment.recipe_id = recipe_id
+    comments.append(comment.model_dump())
+    save_comments(comments)
+    return comment
+
+
+@app.delete("/comments/{comment_id}")
+def delete_comment(comment_id: int):
+    """Delete a comment by its ID.
+
+    Args:
+        comment_id (int): ID of the comment to delete.
+
+    Raises:
+        HTTPException: If the comment with the specified ID is not found.
+
+    Returns:
+        dict: A status message indicating successful deletion.
+    """
+    comments = load_comments()
+    comment_index = next((index for index, c in enumerate(comments) if c["id"] == comment_id), None)
+
+    if comment_index is None:
+        raise HTTPException(status_code=404, detail="Comment not found")
+
+    del comments[comment_index]
+    save_comments(comments)
+    return {"status": "success", "message": "Comment deleted successfully"}
 
 
 if __name__ == "__main__":
