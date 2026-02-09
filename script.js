@@ -24,10 +24,10 @@ function showNoResults() {
     displayArea.innerHTML = '<div class="no-results">No recipes found matching your search.</div>';
 }
 
-// Load and display recipes
-async function loadRecipes() {
+// Load and display recipes (with optional search)
+async function loadRecipes(searchQuery = '') {
     try {
-        recipes = await fetchRecipes();
+        recipes = await fetchRecipes(searchQuery);
         refreshDisplay();
     } catch (error) {
         showError('Failed to load recipes. Please make sure the API server is running at http://localhost:8000');
@@ -135,8 +135,9 @@ async function handleDeleteRecipe(index) {
         // Delete via API
         await deleteRecipe(recipeId);
         
-        // Refresh recipes from server
-        await loadRecipes();
+        // Refresh recipes from server with current search query
+        const searchQuery = searchInput.value;
+        await loadRecipes(searchQuery);
         
         // Show success message
         alert('Recipe deleted successfully!');
@@ -147,17 +148,12 @@ async function handleDeleteRecipe(index) {
 
 // Refresh Display Function (helper to redisplay all recipes)
 function refreshDisplay() {
-    // Get search query
-    const searchQuery = searchInput ? searchInput.value : '';
-    
-    // Filter recipes based on search
-    const filteredRecipes = filterRecipes(recipes, searchQuery);
-    
     // Clear the display area
     displayArea.innerHTML = '';
 
     // Check if there are no results
-    if (filteredRecipes.length === 0) {
+    if (recipes.length === 0) {
+        const searchQuery = searchInput ? searchInput.value : '';
         if (searchQuery) {
             showNoResults();
         } else {
@@ -166,11 +162,9 @@ function refreshDisplay() {
         return;
     }
 
-    // Display filtered recipes with their current index
-    filteredRecipes.forEach(function(recipe) {
-        // Find original index in recipes array
-        const originalIndex = recipes.findIndex(r => r.id === recipe.id);
-        displayRecipe(recipe, originalIndex);
+    // Display recipes with their current index
+    recipes.forEach(function(recipe, index) {
+        displayRecipe(recipe, index);
     });
 }
 
@@ -224,8 +218,9 @@ recipeForm.addEventListener('submit', async function(event) {
             
             await updateRecipe(recipeId, recipeData);
             
-            // Refresh recipes from server
-            await loadRecipes();
+            // Refresh recipes from server with current search query
+            const searchQuery = searchInput.value;
+            await loadRecipes(searchQuery);
             
             // Show success message
             alert('Recipe updated successfully!');
@@ -233,7 +228,8 @@ recipeForm.addEventListener('submit', async function(event) {
             // Create new recipe via API
             await createRecipe(recipeData);
             
-            // Refresh recipes from server
+            // Refresh recipes from server (clear search)
+            searchInput.value = '';
             await loadRecipes();
             
             // Show success message
@@ -248,8 +244,14 @@ recipeForm.addEventListener('submit', async function(event) {
 });
 
 // Search Input Event Listener
+let searchTimeout;
 searchInput.addEventListener('input', function() {
-    refreshDisplay();
+    // Debounce search to avoid too many API calls
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+        const searchQuery = searchInput.value;
+        loadRecipes(searchQuery);
+    }, 300); // Wait 300ms after user stops typing
 });
 
 // Load recipes when page loads

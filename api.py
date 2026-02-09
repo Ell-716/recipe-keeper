@@ -8,7 +8,7 @@ It uses a JSON file for storage, and FastAPI for the web server.
 import os.path
 import json
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import uvicorn
@@ -60,7 +60,7 @@ class Recipe(BaseModel):
     Attributes:
         id (int): Recipe identifier.
         name (str): Name of the recipe.
-        ingredients (list[str]): List of ingredients for the recipe.
+        ingredients (str): Ingredients for the recipe.
         steps (str): Steps for preparation.
         imageUrl (str): URL of the recipe image.
     """
@@ -72,9 +72,31 @@ class Recipe(BaseModel):
 
 
 @app.get("/recipes")
-def read_recipes():
-    """Retrieve all recipes."""
-    return load_recipes()
+def read_recipes(search: str = Query(None, description="Search query for filtering recipes")):
+    """Retrieve all recipes, optionally filtered by search query.
+    
+    Args:
+        search (str, optional): Search query to filter recipes by name, ingredients, or steps.
+    
+    Returns:
+        list: List of recipes matching the search criteria.
+    """
+    recipes = load_recipes()
+    
+    # If no search query, return all recipes
+    if not search:
+        return recipes
+    
+    # Filter recipes based on search query
+    search_lower = search.lower()
+    filtered_recipes = [
+        recipe for recipe in recipes
+        if (search_lower in recipe["name"].lower() or
+            search_lower in recipe["ingredients"].lower() or
+            search_lower in recipe["steps"].lower())
+    ]
+    
+    return filtered_recipes
 
 
 @app.post("/recipes")
@@ -167,3 +189,4 @@ def delete_recipe(recipe_id: int):
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
+    

@@ -1,10 +1,17 @@
 // API Configuration
 const API_URL = 'http://localhost:8000';
 
-// API Function: Fetch all recipes
-async function fetchRecipes() {
+// API Function: Fetch all recipes (with optional search)
+async function fetchRecipes(searchQuery = '') {
     try {
-        const response = await fetch(`${API_URL}/recipes`);
+        let url = `${API_URL}/recipes`;
+        
+        // Add search query parameter if provided
+        if (searchQuery && searchQuery.trim() !== '') {
+            url += `?search=${encodeURIComponent(searchQuery)}`;
+        }
+        
+        const response = await fetch(url);
         
         if (!response.ok) {
             throw new Error('Failed to fetch recipes');
