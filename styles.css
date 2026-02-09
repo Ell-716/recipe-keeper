@@ -286,6 +286,28 @@ button[type="submit"]:hover {
     text-align: center;
 }
 
+#searchInput {
+    position: absolute;
+    top: 15px;
+    right: 180px;
+    width: 250px;
+    padding: 10px 15px;
+    border: 1px solid #d0d0d0;
+    border-radius: 25px;
+    font-family: 'Arial', sans-serif;
+    font-size: 0.9rem;
+    background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    z-index: 10;
+}
+
+#searchInput:focus {
+    outline: none;
+    border-color: #4a7c59;
+    box-shadow: 0 2px 12px rgba(74, 124, 89, 0.2);
+}
+
 /* Responsive Design */
 @media (max-width: 1024px) {
     .container {

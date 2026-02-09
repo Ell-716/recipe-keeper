@@ -55,3 +55,25 @@ function validateRecipeData(name, ingredients, steps, imageUrl) {
     
     return { valid: true };
 }
+
+// Filter recipes based on search query
+function filterRecipes(recipes, searchQuery) {
+    if (!searchQuery || searchQuery.trim() === '') {
+        return recipes;
+    }
+    
+    const query = searchQuery.toLowerCase();
+    
+    return recipes.filter(recipe => {
+        // Search in recipe name
+        const nameMatch = recipe.name.toLowerCase().includes(query);
+        
+        // Search in ingredients
+        const ingredientsMatch = recipe.ingredients.toLowerCase().includes(query);
+        
+        // Search in steps
+        const stepsMatch = recipe.steps.toLowerCase().includes(query);
+        
+        return nameMatch || ingredientsMatch || stepsMatch;
+    });
+}

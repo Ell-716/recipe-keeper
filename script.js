@@ -5,6 +5,7 @@ let ingredients = document.getElementById('ingredients');
 let steps = document.getElementById('steps');
 let recipeImage = document.getElementById('recipeImage');
 let displayArea = document.getElementById('recipeDisplay');
+let searchInput = document.getElementById('searchInput');
 
 // Array for Recipes
 let recipes = [];
@@ -16,6 +17,11 @@ let editIndex = -1;
 // Show error message
 function showError(message) {
     displayArea.innerHTML = `<div class="error-message">${message}</div>`;
+}
+
+// Show no results message
+function showNoResults() {
+    displayArea.innerHTML = '<div class="no-results">No recipes found matching your search.</div>';
 }
 
 // Load and display recipes
@@ -141,12 +147,30 @@ async function handleDeleteRecipe(index) {
 
 // Refresh Display Function (helper to redisplay all recipes)
 function refreshDisplay() {
+    // Get search query
+    const searchQuery = searchInput ? searchInput.value : '';
+    
+    // Filter recipes based on search
+    const filteredRecipes = filterRecipes(recipes, searchQuery);
+    
     // Clear the display area
     displayArea.innerHTML = '';
 
-    // Display all recipes with their current index
-    recipes.forEach(function(recipe, index) {
-        displayRecipe(recipe, index);
+    // Check if there are no results
+    if (filteredRecipes.length === 0) {
+        if (searchQuery) {
+            showNoResults();
+        } else {
+            displayArea.innerHTML = '<div class="no-results">No recipes yet. Add your first recipe!</div>';
+        }
+        return;
+    }
+
+    // Display filtered recipes with their current index
+    filteredRecipes.forEach(function(recipe) {
+        // Find original index in recipes array
+        const originalIndex = recipes.findIndex(r => r.id === recipe.id);
+        displayRecipe(recipe, originalIndex);
     });
 }
 
@@ -221,6 +245,11 @@ recipeForm.addEventListener('submit', async function(event) {
     } catch (error) {
         alert('Failed to save recipe. Please try again.');
     }
+});
+
+// Search Input Event Listener
+searchInput.addEventListener('input', function() {
+    refreshDisplay();
 });
 
 // Load recipes when page loads
