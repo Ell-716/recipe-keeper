@@ -84,6 +84,32 @@ async function deleteRecipeAPI(recipeId) {
     }
 }
 
+// API Function: Update a recipe
+async function updateRecipeAPI(recipeId, recipeData) {
+    try {
+        const response = await fetch(`${API_URL}/recipes/${recipeId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(recipeData)
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to update recipe');
+        }
+        
+        // Refresh recipes from server
+        await fetchRecipes();
+        
+        return await response.json();
+    } catch (error) {
+        console.error('Error updating recipe:', error);
+        alert('Failed to update recipe. Please try again.');
+        return null;
+    }
+}
+
 // Function to capitalize recipe name
 function capitalizeRecipeName(name) {
     return name
@@ -275,25 +301,22 @@ recipeForm.addEventListener('submit', async function(event) {
     // Capitalize recipe name
     enteredRecipeName = capitalizeRecipeName(enteredRecipeName);
 
-    if (isEditMode) {
-        // Update existing recipe (will implement API call in next step)
-        recipes[editIndex] = {
-            name: enteredRecipeName,
-            ingredients: enteredIngredients,
-            steps: enteredSteps,
-            imageUrl: enteredImageUrl
-        };
+    // Prepare recipe data
+    const recipeData = {
+        name: enteredRecipeName,
+        ingredients: enteredIngredients,
+        steps: enteredSteps,
+        imageUrl: enteredImageUrl
+    };
 
-        refreshDisplay();
+    if (isEditMode) {
+        // Update existing recipe via API
+        let recipe = recipes[editIndex];
+        let recipeId = recipe.id;
+        
+        await updateRecipeAPI(recipeId, recipeData);
     } else {
         // Create new recipe via API
-        const recipeData = {
-            name: enteredRecipeName,
-            ingredients: enteredIngredients,
-            steps: enteredSteps,
-            imageUrl: enteredImageUrl
-        };
-
         await createRecipe(recipeData);
     }
 
