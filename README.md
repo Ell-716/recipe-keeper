@@ -1,66 +1,134 @@
 # Recipe Keeper 🍳
 
-A beautiful and functional web application to store and manage your favorite recipes.
+A full-stack web application for storing and managing your favorite recipes with search, sorting, and commenting features.
 
-## Features
+## Features ✨
 
-✨ **Add Recipes** - Store recipe name, ingredients, preparation steps, and images  
-✏️ **Edit Recipes** - Update any recipe details anytime  
-🗑️ **Delete Recipes** - Remove recipes you no longer need  
-💾 **Persistent Storage** - Recipes are saved in browser local storage  
-📱 **Responsive Design** - Works seamlessly on desktop and mobile devices  
-🎨 **Elegant UI** - Clean, sophisticated design with a kitchen-themed background
+- **CRUD Operations**: Create, Read, Update, and Delete recipes
+- **Search Functionality**: Real-time search across recipe names, ingredients, and steps
+- **Advanced Sorting**: Sort recipes by name (A-Z, Z-A), date added (newest/oldest), or number of comments
+- **Comment System**: Add and delete comments on recipes with a modal interface
+- **Responsive Design**: Clean, professional UI with background imagery
+- **Icon-based Actions**: Intuitive edit, delete, and comment icons
+- **Recipe Display**: Beautiful recipe cards with images, formatted ingredients, and step-by-step instructions
 
-## Technologies Used
+## Tech Stack 🛠️
 
-- **HTML5** - Structure and semantic markup
-- **CSS3** - Styling with modern features (Grid, Flexbox)
-- **JavaScript (ES6)** - Dynamic functionality and DOM manipulation
-- **Local Storage API** - Data persistence
+### Backend
+- **FastAPI**: Modern Python web framework
+- **Uvicorn**: ASGI server
+- **Pydantic**: Data validation
+- **JSON**: File-based storage
 
-## How to Use
+### Frontend
+- **HTML5**: Structure
+- **CSS3**: Styling with custom design
+- **Vanilla JavaScript**: Dynamic functionality
+- **Fetch API**: HTTP requests
 
-1. Clone this repository
-```bash
-git clone https://github.com/Ell-716/recipe-keeper.git
-```
-
-2. Open `recipes.html` in your browser
-
-3. Start adding your favorite recipes!
-
-## Features in Detail
-
-### Smart Formatting
-- **Recipe Names** - Automatically capitalizes (e.g., "pizza hawaii" → "Pizza Hawaii")
-- **Ingredients** - Displays as a bulleted list for easy reading
-- **Steps** - Shows as a numbered list for clear instructions
-
-### Data Validation
-- All required fields must be filled
-- Image URLs are validated
-- User-friendly error messages
-
-### User Experience
-- Two-column layout for easy recipe management
-- Smooth form interactions
-- Visual feedback on hover and focus states
-- Auto-scroll to form when editing
-
-## Project Structure
+## Project Structure 📁
 ```
 recipe-keeper/
-├── recipes.html    # Main HTML file
-├── styles.css      # All styling
-├── script.js       # Application logic
-└── README.md       # This file
+├── backend/
+│   ├── api.py              # FastAPI application
+│   ├── recipes.json        # Recipe data storage
+│   └── comments.json       # Comments data storage
+├── frontend/
+│   ├── index.html          # Main HTML file
+│   ├── css/
+│   │   └── styles.css      # Styles
+│   ├── js/
+│   │   ├── api.js          # API functions
+│   │   ├── validators.js   # Validation & formatting
+│   │   └── script.js       # Main application logic
+│   └── assets/
+│       ├── bin.png         # Delete icon
+│       ├── edit-text.png   # Edit icon
+│       ├── chat.png        # Comment icon
+│       ├── search.png      # Search icon
+│       └── filter.png      # Sort/filter icon
+├── .gitignore
+├── requirements.txt
+└── README.md
 ```
 
-## Learning Journey
+## Installation 🚀
 
-This project was built as part of a Python to JavaScript course, demonstrating:
-- DOM manipulation
-- Event handling
-- Data persistence with Local Storage
-- Responsive web design
-- CRUD operations
+### Prerequisites
+- Python 3.8+
+- pip
+
+### Setup
+
+1. **Clone the repository**
+```bash
+   git clone https://github.com/Ell-716/recipe-keeper.git
+   cd recipe-keeper
+```
+
+2. **Install Python dependencies**
+```bash
+   pip install -r requirements.txt
+```
+
+3. **Start the backend server**
+```bash
+   cd backend
+   python api.py
+```
+   The API will be available at `http://localhost:8000`
+
+4. **Open the frontend**
+   
+   Option 1: Open directly in browser
+```bash
+   # Simply open frontend/index.html in your browser
+```
+
+   Option 2: Use a local server (recommended)
+```bash
+   cd frontend
+   python -m http.server 8080
+```
+   Then visit `http://localhost:8080`
+
+## API Documentation 📚
+
+Once the backend is running, visit:
+- **Swagger UI**: `http://localhost:8000/docs`
+- **ReDoc**: `http://localhost:8000/redoc`
+
+### API Endpoints
+
+#### Recipes
+- `GET /recipes` - Get all recipes (supports `?search=query` parameter)
+- `POST /recipes` - Create a new recipe
+- `GET /recipes/{recipe_id}` - Get a specific recipe
+- `PUT /recipes/{recipe_id}` - Update a recipe
+- `DELETE /recipes/{recipe_id}` - Delete a recipe
+
+#### Comments
+- `GET /recipes/{recipe_id}/comments` - Get all comments for a recipe
+- `POST /recipes/{recipe_id}/comments` - Add a comment to a recipe
+- `DELETE /comments/{comment_id}` - Delete a comment
+
+## Credits 🙏
+
+- Icons from [Flaticon](https://www.flaticon.com/)
+- Background images from [Unsplash](https://unsplash.com/)
+
+## License 📄
+
+This project is open source and available under the [MIT License](LICENSE).
+
+## Contributing 🤝
+
+Contributions, issues, and feature requests are welcome!
+
+## Author ✍️
+
+Created as a learning project for JavaScript course.
+
+---
+
+**Enjoy cooking! 👨‍🍳👩‍🍳**
