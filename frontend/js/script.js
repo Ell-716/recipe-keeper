@@ -125,7 +125,7 @@ async function displayRecipe(recipe, index) {
     // Edit icon
     let editIcon = document.createElement('button');
     editIcon.classList.add('icon-button', 'edit-icon');
-    editIcon.innerHTML = '<img src="edit-text.png" alt="Edit" style="width: 24px; height: 24px;">';
+    editIcon.innerHTML = '<img src="assets/edit-text.png" alt="Edit" style="width: 24px; height: 24px;">';
     editIcon.title = 'Edit recipe';
     editIcon.onclick = function() {
         editRecipe(index);
@@ -134,7 +134,7 @@ async function displayRecipe(recipe, index) {
     // Delete icon
     let deleteIcon = document.createElement('button');
     deleteIcon.classList.add('icon-button', 'delete-icon');
-    deleteIcon.innerHTML = '<img src="bin.png" alt="Delete" style="width: 24px; height: 24px;">';
+    deleteIcon.innerHTML = '<img src="assets/bin.png" alt="Delete" style="width: 24px; height: 24px;">';
     deleteIcon.title = 'Delete recipe';
     deleteIcon.onclick = function() {
         handleDeleteRecipe(index);
@@ -143,7 +143,7 @@ async function displayRecipe(recipe, index) {
     // Comment icon with count
     let commentIconContainer = document.createElement('button');
     commentIconContainer.classList.add('icon-button', 'comment-icon');
-    commentIconContainer.innerHTML = '<img src="chat.png" alt="Comments" style="width: 24px; height: 24px;">';
+    commentIconContainer.innerHTML = '<img src="assets/chat.png" alt="Comments" style="width: 24px; height: 24px;">';
     commentIconContainer.title = 'View comments';
     
     // Use cached comment count
@@ -272,7 +272,7 @@ async function loadCommentsInModal(recipeId, commentsList) {
 
             let deleteBtn = document.createElement('button');
             deleteBtn.classList.add('comment-delete-icon');
-            deleteBtn.innerHTML = '<img src="bin.png" alt="Delete" style="width: 18px; height: 18px;">';
+            deleteBtn.innerHTML = '<img src="assets/bin.png" alt="Delete" style="width: 18px; height: 18px;">';
             deleteBtn.title = 'Delete comment';
             deleteBtn.onclick = async function() {
                 await handleDeleteComment(comment.id, recipeId, commentsList);

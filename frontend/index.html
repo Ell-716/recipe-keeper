@@ -4,16 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recipe Keeper</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
     <!-- Header -->
     <h1>Recipe Keeper</h1>
 
     <!-- Search Bar - Top Right -->
-    <input type="text" id="searchInput" placeholder="Search recipes..." style="background-image: url('search.png'); background-repeat: no-repeat; background-position: 10px center; background-size: 18px; padding-left: 35px;">
+    <input type="text" id="searchInput" placeholder="Search recipes..." 
+    style="background-image: url('assets/search.png'); background-repeat: no-repeat; background-position: 10px center; background-size: 18px; padding-left: 35px;">
     <button id="sortButton" class="sort-icon-button">
-        <img src="filter.png" alt="Sort" style="width: 24px; height: 24px;">
+        <img src="assets/filter.png" alt="Sort" style="width: 24px; height: 24px;">
     </button>
     <div id="sortMenu" class="sort-menu" style="display: none;">
         <div class="sort-option" data-sort="name-asc">Name (A-Z)</div>
@@ -52,8 +53,8 @@
         </div>
     </div>
 
-    <script src="api.js"></script>
-    <script src="validators.js"></script>
-    <script src="script.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/validators.js"></script>
+    <script src="js/script.js"></script>
 </body>
 </html>
