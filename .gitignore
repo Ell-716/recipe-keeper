@@ -26,3 +26,4 @@ backend/comments.json
 
 # Environment variables
 .env
+.venv/
