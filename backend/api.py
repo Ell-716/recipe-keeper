@@ -122,22 +122,28 @@ def read_recipes(search: str = Query(None, description="Search query for filteri
         search (str, optional): Search query to filter recipes by name, ingredients, or steps.
     
     Returns:
-        list: List of recipes matching the search criteria.
+        list: List of recipes matching the search criteria with comment counts.
     """
     recipes = load_recipes()
+    comments = load_comments()
     
     # If no search query, return all recipes
     if not search:
-        return recipes
+        filtered_recipes = recipes
+    else:
+        # Filter recipes based on search query
+        search_lower = search.lower()
+        filtered_recipes = [
+            recipe for recipe in recipes
+            if (search_lower in recipe["name"].lower() or
+                search_lower in recipe["ingredients"].lower() or
+                search_lower in recipe["steps"].lower())
+        ]
     
-    # Filter recipes based on search query
-    search_lower = search.lower()
-    filtered_recipes = [
-        recipe for recipe in recipes
-        if (search_lower in recipe["name"].lower() or
-            search_lower in recipe["ingredients"].lower() or
-            search_lower in recipe["steps"].lower())
-    ]
+    # Add comment counts to each recipe
+    for recipe in filtered_recipes:
+        recipe_comments = [c for c in comments if c["recipe_id"] == recipe["id"]]
+        recipe["comment_count"] = len(recipe_comments)
     
     return filtered_recipes
 

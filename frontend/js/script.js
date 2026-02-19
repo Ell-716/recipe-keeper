@@ -65,25 +65,15 @@ async function loadRecipes(searchQuery = '') {
     try {
         recipes = await fetchRecipes(searchQuery);
         
-        // Load comment counts for all recipes
-        await loadAllCommentCounts();
+        // Store comment counts from API response
+        commentCounts = {};
+        recipes.forEach(recipe => {
+            commentCounts[recipe.id] = recipe.comment_count || 0;
+        });
         
         refreshDisplay();
     } catch (error) {
         showError('Failed to load recipes. Please make sure the API server is running at http://localhost:8000');
-    }
-}
-
-// Load comment counts for all recipes
-async function loadAllCommentCounts() {
-    commentCounts = {};
-    for (let recipe of recipes) {
-        try {
-            const comments = await getComments(recipe.id);
-            commentCounts[recipe.id] = comments.length;
-        } catch (error) {
-            commentCounts[recipe.id] = 0;
-        }
     }
 }
 
@@ -145,16 +135,16 @@ async function displayRecipe(recipe, index) {
     commentIconContainer.classList.add('icon-button', 'comment-icon');
     commentIconContainer.innerHTML = '<img src="assets/chat.png" alt="Comments" style="width: 24px; height: 24px;">';
     commentIconContainer.title = 'View comments';
-    
-    // Use cached comment count
-    const commentCount = commentCounts[recipe.id] || 0;
+
+    // Use comment count from recipe object (already loaded)
+    const commentCount = recipe.comment_count || 0;
     if (commentCount > 0) {
         let commentCountBadge = document.createElement('span');
         commentCountBadge.classList.add('comment-count');
         commentCountBadge.textContent = commentCount;
         commentIconContainer.appendChild(commentCountBadge);
     }
-    
+
     commentIconContainer.onclick = function() {
         openCommentsModal(recipe.id, recipe.name);
     };
