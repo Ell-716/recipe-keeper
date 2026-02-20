@@ -442,7 +442,7 @@ recipeForm.addEventListener('submit', async function(event) {
     let enteredImageUrl = recipeImage.value.trim();
 
     // Validation
-    const validation = validateRecipeData(enteredRecipeName, enteredIngredients, enteredSteps, enteredImageUrl);
+    const validation = validateRecipeData(enteredRecipeName, enteredIngredients, enteredSteps);
     if (!validation.valid) {
         alert(validation.message);
         return;

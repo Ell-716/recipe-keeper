@@ -46,10 +46,10 @@ function formatStepsList(stepsText) {
 
 // Validate recipe form data
 function validateRecipeData(name, ingredients, steps, imageUrl) {
-    if (!name || !ingredients || !steps || !imageUrl) {
+    if (!name || !ingredients || !steps) {
         return {
             valid: false,
-            message: 'Please fill in all required fields (Recipe Name, Ingredients, Steps and Image URL)'
+            message: 'Please fill in all required fields (Recipe Name, Ingredients, and Steps)'
         };
     }
     
