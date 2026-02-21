@@ -5,6 +5,10 @@ A full-stack web application for storing and managing your favorite recipes with
 ## Features ✨
 
 - **CRUD Operations**: Create, Read, Update, and Delete recipes
+- **Multiple View Modes**: Switch between Compact (default), Grid, and List views
+  - **Compact View**: Grid of recipe cards with images - click to expand for full details
+  - **Grid View**: Full detailed recipe cards with all information visible
+  - **List View**: Accordion-style list - click recipe names to expand/collapse
 - **Search Functionality**: Real-time search across recipe names, ingredients, and steps
 - **Advanced Sorting**: Sort recipes by name (A-Z, Z-A), date added (newest/oldest), or number of comments
 - **Comment System**: Add and delete comments on recipes with a modal interface
@@ -46,7 +50,8 @@ recipe-keeper/
 │       ├── edit-text.png   # Edit icon
 │       ├── chat.png        # Comment icon
 │       ├── search.png      # Search icon
-│       └── filter.png      # Sort/filter icon
+│       ├── filter.png      # Sort/filter icon
+│       └── down.png        # Dropdown arrow icon
 ├── .gitignore
 ├── requirements.txt
 └── README.md
