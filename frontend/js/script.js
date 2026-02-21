@@ -122,24 +122,49 @@ function displayRecipeGrid(recipe, index) {
     displayArea.appendChild(recipeDiv);
 }
 
-// Compact View (grid of cards with images and names only)
+// Compact View (grid of small cards that expand on click)
 function displayRecipeCompact(recipe, index) {
     let recipeDiv = document.createElement('div');
     recipeDiv.classList.add('recipe-card');
+
+    // Card content (always visible - image and name)
+    let cardPreview = document.createElement('div');
+    cardPreview.classList.add('recipe-preview');
+    cardPreview.style.cursor = 'pointer';
 
     if (recipe.imageUrl && recipe.imageUrl.trim() !== '') {
         let recipeImg = document.createElement('img');
         recipeImg.src = recipe.imageUrl;
         recipeImg.alt = recipe.name;
-        recipeDiv.appendChild(recipeImg);
+        cardPreview.appendChild(recipeImg);
     }
 
     let nameHeading = document.createElement('h3');
     nameHeading.textContent = recipe.name;
-    recipeDiv.appendChild(nameHeading);
+    cardPreview.appendChild(nameHeading);
+
+    // Recipe details (collapsible)
+    let recipeDetails = document.createElement('div');
+    recipeDetails.classList.add('recipe-details');
+
+    let ingredientsPara = document.createElement('div');
+    ingredientsPara.innerHTML = formatIngredientsList(recipe.ingredients);
+    recipeDetails.appendChild(ingredientsPara);
+
+    let stepsPara = document.createElement('div');
+    stepsPara.innerHTML = formatStepsList(recipe.steps);
+    recipeDetails.appendChild(stepsPara);
 
     let actionIcons = createActionIcons(recipe, index);
-    recipeDiv.appendChild(actionIcons);
+    recipeDetails.appendChild(actionIcons);
+
+    // Toggle expand/collapse on click
+    cardPreview.onclick = function() {
+        recipeDiv.classList.toggle('expanded');
+    };
+
+    recipeDiv.appendChild(cardPreview);
+    recipeDiv.appendChild(recipeDetails);
 
     displayArea.appendChild(recipeDiv);
 }
