@@ -82,10 +82,10 @@ async function loadRecipes(searchQuery = '') {
 
 // Display Function - Routes to appropriate view
 async function displayRecipe(recipe, index) {
-    if (currentView === 'compact') {
-        displayRecipeCompact(recipe, index);
-    } else if (currentView === 'list') {
+    if (currentView === 'list') {
         displayRecipeList(recipe, index);
+    } else if (currentView === 'compact') {
+        displayRecipeCompact(recipe, index);
     } else {
         displayRecipeGrid(recipe, index);
     }
@@ -122,8 +122,8 @@ function displayRecipeGrid(recipe, index) {
     displayArea.appendChild(recipeDiv);
 }
 
-// List View (grid of cards with images and names only)
-function displayRecipeList(recipe, index) {
+// Compact View (grid of cards with images and names only)
+function displayRecipeCompact(recipe, index) {
     let recipeDiv = document.createElement('div');
     recipeDiv.classList.add('recipe-card');
 
@@ -144,8 +144,8 @@ function displayRecipeList(recipe, index) {
     displayArea.appendChild(recipeDiv);
 }
 
-// Compact View (accordion/collapsible)
-function displayRecipeCompact(recipe, index) {
+// List View (accordion/collapsible)
+function displayRecipeList(recipe, index) {
     let recipeDiv = document.createElement('div');
     recipeDiv.classList.add('recipe-card');
 
