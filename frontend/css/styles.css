@@ -590,6 +590,13 @@ button[type="submit"]:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
+#recipeDisplay.grid-view .recipe-card img {
+    width: 100%;
+    max-height: 420px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
 /* Compact View - Side by side grid with expandable cards */
 #recipeDisplay.compact-view {
     display: grid;
@@ -646,6 +653,13 @@ button[type="submit"]:hover {
     grid-column: span 2;
 }
 
+#recipeDisplay.compact-view .recipe-card.expanded img {
+    width: 100%;
+    max-height: 420px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
 /* On smaller screens, expanded card spans all columns */
 @media (max-width: 900px) {
     #recipeDisplay.compact-view .recipe-card.expanded {
@@ -696,6 +710,13 @@ button[type="submit"]:hover {
 
 #recipeDisplay.list-view .recipe-card.expanded .recipe-expand-icon {
     transform: rotate(180deg);
+}
+
+#recipeDisplay.list-view .recipe-card.expanded img {
+    width: 100%;
+    max-height: 420px;
+    object-fit: cover;
+    border-radius: 8px;
 }
 
 #recipeDisplay.list-view .recipe-content {

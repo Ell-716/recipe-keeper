@@ -11,7 +11,7 @@ let sortMenu = document.getElementById('sortMenu');
 let viewButton = document.getElementById('viewButton');
 let viewMenu = document.getElementById('viewMenu');
 let currentSort = 'name-asc'; // Default sort
-let currentView = 'grid'; // Default view
+let currentView = 'compact'; // Default view
 
 // Array for Recipes
 let recipes = [];
