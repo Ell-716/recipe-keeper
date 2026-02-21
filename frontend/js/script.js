@@ -8,7 +8,9 @@ let displayArea = document.getElementById('recipeDisplay');
 let searchInput = document.getElementById('searchInput');
 let sortButton = document.getElementById('sortButton');
 let sortMenu = document.getElementById('sortMenu');
-let currentSort = 'name-asc';
+let viewSelect = document.getElementById('viewSelect');
+let currentSort = 'name-asc'; // Default sort
+let currentView = 'grid'; // Default view
 
 // Array for Recipes
 let recipes = [];
@@ -77,17 +79,25 @@ async function loadRecipes(searchQuery = '') {
     }
 }
 
-// Display Function
+// Display Function - Routes to appropriate view
 async function displayRecipe(recipe, index) {
-    // create a div for the new recipe
+    if (currentView === 'compact') {
+        displayRecipeCompact(recipe, index);
+    } else if (currentView === 'list') {
+        displayRecipeList(recipe, index);
+    } else {
+        displayRecipeGrid(recipe, index);
+    }
+}
+
+// Grid View (original full display)
+function displayRecipeGrid(recipe, index) {
     let recipeDiv = document.createElement('div');
     recipeDiv.classList.add('recipe-card');
 
-    // create recipe name heading
     let nameHeading = document.createElement('h3');
     nameHeading.textContent = recipe.name;
 
-    // create and display image if URL is provided
     if (recipe.imageUrl && recipe.imageUrl.trim() !== '') {
         let recipeImg = document.createElement('img');
         recipeImg.src = recipe.imageUrl;
@@ -95,20 +105,98 @@ async function displayRecipe(recipe, index) {
         recipeDiv.appendChild(recipeImg);
     }
 
-    // create ingredients list
     let ingredientsPara = document.createElement('div');
     ingredientsPara.innerHTML = formatIngredientsList(recipe.ingredients);
 
-    // create steps list
     let stepsPara = document.createElement('div');
     stepsPara.innerHTML = formatStepsList(recipe.steps);
 
-    // append elements to recipe div
     recipeDiv.appendChild(nameHeading);
     recipeDiv.appendChild(ingredientsPara);
     recipeDiv.appendChild(stepsPara);
 
-    // Create action icons container
+    let actionIcons = createActionIcons(recipe, index);
+    recipeDiv.appendChild(actionIcons);
+
+    displayArea.appendChild(recipeDiv);
+}
+
+// List View (grid of cards with images and names only)
+function displayRecipeList(recipe, index) {
+    let recipeDiv = document.createElement('div');
+    recipeDiv.classList.add('recipe-card');
+
+    if (recipe.imageUrl && recipe.imageUrl.trim() !== '') {
+        let recipeImg = document.createElement('img');
+        recipeImg.src = recipe.imageUrl;
+        recipeImg.alt = recipe.name;
+        recipeDiv.appendChild(recipeImg);
+    }
+
+    let nameHeading = document.createElement('h3');
+    nameHeading.textContent = recipe.name;
+    recipeDiv.appendChild(nameHeading);
+
+    let actionIcons = createActionIcons(recipe, index);
+    recipeDiv.appendChild(actionIcons);
+
+    displayArea.appendChild(recipeDiv);
+}
+
+// Compact View (accordion/collapsible)
+function displayRecipeCompact(recipe, index) {
+    let recipeDiv = document.createElement('div');
+    recipeDiv.classList.add('recipe-card');
+
+    // Recipe header (always visible)
+    let recipeHeader = document.createElement('div');
+    recipeHeader.classList.add('recipe-header');
+
+    let nameHeading = document.createElement('h3');
+    nameHeading.textContent = recipe.name;
+
+    let expandIcon = document.createElement('span');
+    expandIcon.classList.add('recipe-expand-icon');
+    expandIcon.textContent = '▼';
+
+    recipeHeader.appendChild(nameHeading);
+    recipeHeader.appendChild(expandIcon);
+
+    // Recipe content (collapsible)
+    let recipeContent = document.createElement('div');
+    recipeContent.classList.add('recipe-content');
+
+    if (recipe.imageUrl && recipe.imageUrl.trim() !== '') {
+        let recipeImg = document.createElement('img');
+        recipeImg.src = recipe.imageUrl;
+        recipeImg.alt = recipe.name;
+        recipeContent.appendChild(recipeImg);
+    }
+
+    let ingredientsPara = document.createElement('div');
+    ingredientsPara.innerHTML = formatIngredientsList(recipe.ingredients);
+    recipeContent.appendChild(ingredientsPara);
+
+    let stepsPara = document.createElement('div');
+    stepsPara.innerHTML = formatStepsList(recipe.steps);
+    recipeContent.appendChild(stepsPara);
+
+    let actionIcons = createActionIcons(recipe, index);
+    recipeContent.appendChild(actionIcons);
+
+    // Toggle expand/collapse
+    recipeHeader.onclick = function() {
+        recipeDiv.classList.toggle('expanded');
+    };
+
+    recipeDiv.appendChild(recipeHeader);
+    recipeDiv.appendChild(recipeContent);
+
+    displayArea.appendChild(recipeDiv);
+}
+
+// Helper function to create action icons (reusable)
+function createActionIcons(recipe, index) {
     let actionIcons = document.createElement('div');
     actionIcons.classList.add('action-icons');
 
@@ -135,8 +223,7 @@ async function displayRecipe(recipe, index) {
     commentIconContainer.classList.add('icon-button', 'comment-icon');
     commentIconContainer.innerHTML = '<img src="assets/chat.png" alt="Comments" style="width: 24px; height: 24px;">';
     commentIconContainer.title = 'View comments';
-
-    // Use comment count from recipe object (already loaded)
+    
     const commentCount = recipe.comment_count || 0;
     if (commentCount > 0) {
         let commentCountBadge = document.createElement('span');
@@ -144,20 +231,16 @@ async function displayRecipe(recipe, index) {
         commentCountBadge.textContent = commentCount;
         commentIconContainer.appendChild(commentCountBadge);
     }
-
+    
     commentIconContainer.onclick = function() {
         openCommentsModal(recipe.id, recipe.name);
     };
 
-    // Append icons
     actionIcons.appendChild(editIcon);
     actionIcons.appendChild(deleteIcon);
     actionIcons.appendChild(commentIconContainer);
 
-    recipeDiv.appendChild(actionIcons);
-
-    // add the new recipe div to the display area
-    displayArea.appendChild(recipeDiv);
+    return actionIcons;
 }
 
 // Open comments modal
@@ -392,6 +475,9 @@ async function handleDeleteRecipe(index) {
 
 // Refresh Display Function (helper to redisplay all recipes)
 async function refreshDisplay() {
+    // Update view class
+    displayArea.className = `${currentView}-view`;
+    
     // Clear the display area
     displayArea.innerHTML = '';
 
@@ -411,7 +497,6 @@ async function refreshDisplay() {
 
     // Display sorted recipes
     for (let i = 0; i < sortedRecipes.length; i++) {
-        // Find original index for edit/delete operations
         const originalIndex = recipes.findIndex(r => r.id === sortedRecipes[i].id);
         await displayRecipe(sortedRecipes[i], originalIndex);
     }
@@ -503,7 +588,7 @@ searchInput.addEventListener('input', function() {
     }, 300); // Wait 300ms after user stops typing
 });
 
-/// Sort Button and Menu Event Listeners
+// Sort Button and Menu Event Listeners
 sortButton.addEventListener('click', function(e) {
     e.stopPropagation();
     sortMenu.style.display = sortMenu.style.display === 'none' ? 'block' : 'none';
@@ -534,6 +619,12 @@ document.querySelectorAll('.sort-option').forEach(option => {
         // Refresh display with new sort
         refreshDisplay();
     });
+});
+
+// View Select Event Listener
+viewSelect.addEventListener('change', function() {
+    currentView = this.value;
+    refreshDisplay();
 });
 
 // Load recipes when page loads

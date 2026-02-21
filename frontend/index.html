@@ -48,11 +48,17 @@
 
         <!-- Right Column: Your Recipes Section -->
         <div class="recipes-section">
-            <h2>Your Recipes</h2>
+            <div class="recipes-header">
+                <h2>Your Recipes</h2>
+                <select id="viewSelect" class="view-selector">
+                    <option value="grid">Grid View</option>
+                    <option value="list">List View</option>
+                    <option value="compact">Compact View</option>
+                </select>
+            </div>
             <div id="recipeDisplay"></div>
         </div>
-    </div>
-
+  
     <script src="js/api.js"></script>
     <script src="js/validators.js"></script>
     <script src="js/script.js"></script>
