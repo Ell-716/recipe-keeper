@@ -8,7 +8,8 @@ let displayArea = document.getElementById('recipeDisplay');
 let searchInput = document.getElementById('searchInput');
 let sortButton = document.getElementById('sortButton');
 let sortMenu = document.getElementById('sortMenu');
-let viewSelect = document.getElementById('viewSelect');
+let viewButton = document.getElementById('viewButton');
+let viewMenu = document.getElementById('viewMenu');
 let currentSort = 'name-asc'; // Default sort
 let currentView = 'grid'; // Default view
 
@@ -621,10 +622,37 @@ document.querySelectorAll('.sort-option').forEach(option => {
     });
 });
 
-// View Select Event Listener
-viewSelect.addEventListener('change', function() {
-    currentView = this.value;
-    refreshDisplay();
+// View Button and Menu Event Listeners
+viewButton.addEventListener('click', function(e) {
+    e.stopPropagation();
+    viewMenu.style.display = viewMenu.style.display === 'none' ? 'block' : 'none';
+});
+
+// Close view menu when clicking outside
+document.addEventListener('click', function(e) {
+    if (!viewButton.contains(e.target) && !viewMenu.contains(e.target)) {
+        viewMenu.style.display = 'none';
+    }
+});
+
+// Handle view option clicks
+document.querySelectorAll('.view-option').forEach(option => {
+    option.addEventListener('click', function() {
+        // Remove active class from all options
+        document.querySelectorAll('.view-option').forEach(opt => opt.classList.remove('active'));
+        
+        // Add active class to selected option
+        this.classList.add('active');
+        
+        // Update current view
+        currentView = this.getAttribute('data-view');
+        
+        // Hide menu
+        viewMenu.style.display = 'none';
+        
+        // Refresh display with new view
+        refreshDisplay();
+    });
 });
 
 // Load recipes when page loads

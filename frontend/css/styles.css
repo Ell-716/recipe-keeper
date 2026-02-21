@@ -510,37 +510,70 @@ button[type="submit"]:hover {
     color: white;
 }
 
-/* Recipes header with view selector */
+/* Recipes header with view toggle */
 .recipes-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    position: relative;
     margin-bottom: 25px;
+    text-align: center;
 }
 
 .recipes-header h2 {
     margin: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
 }
 
-/* View selector dropdown */
-.view-selector {
-    padding: 8px 15px;
-    border: 1px solid #d0d0d0;
-    border-radius: 6px;
-    font-family: 'Arial', sans-serif;
-    font-size: 0.9rem;
-    background-color: #fff;
+/* View toggle button */
+.view-toggle-button {
+    background: none;
+    border: none;
     cursor: pointer;
-    transition: border-color 0.3s ease;
+    padding: 5px;
+    transition: transform 0.2s ease;
 }
 
-.view-selector:focus {
-    outline: none;
-    border-color: #4a7c59;
+.view-toggle-button:hover {
+    transform: scale(1.1);
 }
 
-.view-selector:hover {
-    border-color: #4a7c59;
+/* View dropdown menu */
+.view-menu {
+    position: absolute;
+    top: 45px;
+    right: 30px;
+    background-color: #fff;
+    border: 1px solid #d0d0d0;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+    min-width: 180px;
+}
+
+.view-option {
+    padding: 12px 20px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    font-family: 'Arial', sans-serif;
+    font-size: 0.95rem;
+    color: #333;
+}
+
+.view-option:first-child {
+    border-radius: 8px 8px 0 0;
+}
+
+.view-option:last-child {
+    border-radius: 0 0 8px 8px;
+}
+
+.view-option:hover {
+    background-color: #f0f0f0;
+}
+
+.view-option.active {
+    background-color: #4a7c59;
+    color: white;
 }
 
 /* Grid View (default - current style) */

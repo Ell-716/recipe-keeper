@@ -49,16 +49,20 @@
         <!-- Right Column: Your Recipes Section -->
         <div class="recipes-section">
             <div class="recipes-header">
-                <h2>Your Recipes</h2>
-                <select id="viewSelect" class="view-selector">
-                    <option value="grid">Grid View</option>
-                    <option value="list">List View</option>
-                    <option value="compact">Compact View</option>
-                </select>
+                <h2>Your Recipes 
+                    <button id="viewButton" class="view-toggle-button">
+                        <img src="assets/down.png" alt="View options" style="width: 16px; height: 16px;">
+                    </button>
+                </h2>
+                <div id="viewMenu" class="view-menu" style="display: none;">
+                    <div class="view-option active" data-view="grid">Grid View</div>
+                    <div class="view-option" data-view="list">List View</div>
+                    <div class="view-option" data-view="compact">Compact View</div>
+                </div>
             </div>
             <div id="recipeDisplay"></div>
         </div>
-  
+    </div>
     <script src="js/api.js"></script>
     <script src="js/validators.js"></script>
     <script src="js/script.js"></script>
