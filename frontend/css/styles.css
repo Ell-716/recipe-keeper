@@ -207,6 +207,49 @@ button[type="submit"]:hover {
     margin-bottom: 15px;
 }
 
+/* Recipe Tags */
+.recipe-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 12px 0;
+}
+
+.recipe-tag {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    font-family: 'Arial', sans-serif;
+    text-transform: capitalize;
+}
+
+/* Tag colors based on category */
+.tag-breakfast { background-color: #FFE5B4; color: #8B4513; }
+.tag-lunch { background-color: #FFE4E1; color: #DC143C; }
+.tag-dinner { background-color: #E6E6FA; color: #4B0082; }
+.tag-dessert { background-color: #FFB6C1; color: #C71585; }
+.tag-snack { background-color: #FFDAB9; color: #FF8C00; }
+.tag-appetizer { background-color: #F0E68C; color: #DAA520; }
+
+.tag-vegan { background-color: #98FB98; color: #228B22; }
+.tag-vegetarian { background-color: #90EE90; color: #2E8B57; }
+.tag-glutenfree { background-color: #DDA0DD; color: #8B008B; }
+.tag-dairyfree { background-color: #B0E0E6; color: #4682B4; }
+.tag-keto { background-color: #FFE4B5; color: #D2691E; }
+.tag-paleo { background-color: #F5DEB3; color: #A0522D; }
+
+.tag-quick { background-color: #87CEEB; color: #1E90FF; }
+.tag-easy { background-color: #98D8C8; color: #2F7F73; }
+.tag-healthy { background-color: #C1FFC1; color: #008B00; }
+.tag-comfort { background-color: #FFDEAD; color: #CD853F; }
+.tag-spicy { background-color: #FFA07A; color: #FF4500; }
+.tag-sweet { background-color: #FFB6D9; color: #FF1493; }
+
+/* Default tag color for unrecognized tags */
+.tag-default { background-color: #E0E0E0; color: #555; }
+
 /* Icon buttons for Edit, Delete, and Comments */
 .action-icons {
     display: flex;

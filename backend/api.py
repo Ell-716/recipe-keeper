@@ -91,12 +91,14 @@ class Recipe(BaseModel):
         ingredients (str): Ingredients for the recipe.
         steps (str): Steps for preparation.
         imageUrl (str): URL of the recipe image.
+        tags (list): List of tags/categories for the recipe.
     """
     id: int = None
     name: str
     ingredients: str
     steps: str
     imageUrl: str = ""
+    tags: list = []
 
 
 class Comment(BaseModel):

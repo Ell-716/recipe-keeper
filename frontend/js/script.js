@@ -12,6 +12,7 @@ let viewButton = document.getElementById('viewButton');
 let viewMenu = document.getElementById('viewMenu');
 let currentSort = 'name-asc'; // Default sort
 let currentView = 'compact'; // Default view
+let recipeTags = document.getElementById('recipeTags');
 
 // Array for Recipes
 let recipes = [];
@@ -98,6 +99,7 @@ function displayRecipeGrid(recipe, index) {
 
     let nameHeading = document.createElement('h3');
     nameHeading.textContent = recipe.name;
+    recipeDiv.appendChild(nameHeading);
 
     if (recipe.imageUrl && recipe.imageUrl.trim() !== '') {
         let recipeImg = document.createElement('img');
@@ -108,13 +110,17 @@ function displayRecipeGrid(recipe, index) {
 
     let ingredientsPara = document.createElement('div');
     ingredientsPara.innerHTML = formatIngredientsList(recipe.ingredients);
+    recipeDiv.appendChild(ingredientsPara);
 
     let stepsPara = document.createElement('div');
     stepsPara.innerHTML = formatStepsList(recipe.steps);
-
-    recipeDiv.appendChild(nameHeading);
-    recipeDiv.appendChild(ingredientsPara);
     recipeDiv.appendChild(stepsPara);
+
+    // Add tags if they exist (at bottom)
+    if (recipe.tags && recipe.tags.length > 0) {
+        let tagBadges = createTagBadges(recipe.tags);
+        recipeDiv.appendChild(tagBadges);
+    }
 
     let actionIcons = createActionIcons(recipe, index);
     recipeDiv.appendChild(actionIcons);
@@ -154,6 +160,12 @@ function displayRecipeCompact(recipe, index) {
     let stepsPara = document.createElement('div');
     stepsPara.innerHTML = formatStepsList(recipe.steps);
     recipeDetails.appendChild(stepsPara);
+
+    // Add tags if they exist (at bottom)
+    if (recipe.tags && recipe.tags.length > 0) {
+        let tagBadges = createTagBadges(recipe.tags);
+        recipeDetails.appendChild(tagBadges);
+    }
 
     let actionIcons = createActionIcons(recipe, index);
     recipeDetails.appendChild(actionIcons);
@@ -206,6 +218,12 @@ function displayRecipeList(recipe, index) {
     let stepsPara = document.createElement('div');
     stepsPara.innerHTML = formatStepsList(recipe.steps);
     recipeContent.appendChild(stepsPara);
+
+    // Add tags if they exist (at bottom)
+    if (recipe.tags && recipe.tags.length > 0) {
+        let tagBadges = createTagBadges(recipe.tags);
+        recipeContent.appendChild(tagBadges);
+    }
 
     let actionIcons = createActionIcons(recipe, index);
     recipeContent.appendChild(actionIcons);
@@ -267,6 +285,40 @@ function createActionIcons(recipe, index) {
     actionIcons.appendChild(commentIconContainer);
 
     return actionIcons;
+}
+
+// Helper function to create tag badges
+function createTagBadges(tags) {
+    if (!tags || tags.length === 0) return '';
+    
+    let tagsContainer = document.createElement('div');
+    tagsContainer.classList.add('recipe-tags');
+    
+    tags.forEach(tag => {
+        let tagBadge = document.createElement('span');
+        tagBadge.classList.add('recipe-tag');
+        
+        // Add specific class based on tag name (lowercase, no spaces)
+        let tagClass = 'tag-' + tag.toLowerCase().replace(/\s+/g, '');
+        
+        // Check if this is a recognized tag category, otherwise use default
+        const recognizedTags = [
+            'breakfast', 'lunch', 'dinner', 'dessert', 'snack', 'appetizer',
+            'vegan', 'vegetarian', 'glutenfree', 'dairyfree', 'keto', 'paleo',
+            'quick', 'easy', 'healthy', 'comfort', 'spicy', 'sweet'
+        ];
+        
+        if (recognizedTags.includes(tag.toLowerCase().replace(/\s+/g, ''))) {
+            tagBadge.classList.add(tagClass);
+        } else {
+            tagBadge.classList.add('tag-default');
+        }
+        
+        tagBadge.textContent = tag;
+        tagsContainer.appendChild(tagBadge);
+    });
+    
+    return tagsContainer;
 }
 
 // Open comments modal
@@ -461,6 +513,7 @@ function editRecipe(index) {
     ingredients.value = recipe.ingredients;
     steps.value = recipe.steps;
     recipeImage.value = recipe.imageUrl || '';
+    recipeTags.value = recipe.tags ? recipe.tags.join(', ') : '';
 
     // Set edit mode
     isEditMode = true;
@@ -468,6 +521,7 @@ function editRecipe(index) {
 
     // Change button text to indicate editing
     let submitButton = document.querySelector('button[type="submit"]');
+    
     submitButton.textContent = "Update Recipe";
 
     // Scroll to form
@@ -534,6 +588,7 @@ function resetForm() {
     ingredients.value = '';
     steps.value = '';
     recipeImage.value = '';
+    recipeTags.value = '';
     isEditMode = false;
     editIndex = -1;
 
@@ -551,6 +606,7 @@ recipeForm.addEventListener('submit', async function(event) {
     let enteredIngredients = ingredients.value.trim();
     let enteredSteps = steps.value.trim();
     let enteredImageUrl = recipeImage.value.trim();
+    let enteredTags = recipeTags.value.trim();
 
     // Validation
     const validation = validateRecipeData(enteredRecipeName, enteredIngredients, enteredSteps);
@@ -562,12 +618,16 @@ recipeForm.addEventListener('submit', async function(event) {
     // Capitalize recipe name
     enteredRecipeName = capitalizeRecipeName(enteredRecipeName);
 
+    // Parse tags (split by comma and trim)
+    let tagsArray = enteredTags ? enteredTags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0) : [];
+
     // Prepare recipe data
     const recipeData = {
         name: enteredRecipeName,
         ingredients: enteredIngredients,
         steps: enteredSteps,
-        imageUrl: enteredImageUrl
+        imageUrl: enteredImageUrl,
+        tags: tagsArray
     };
 
     try {
