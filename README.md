@@ -5,6 +5,10 @@ A full-stack web application for storing and managing your favorite recipes with
 ## Features ✨
 
 - **CRUD Operations**: Create, Read, Update, and Delete recipes
+- **Tag System**: Organize recipes with color-coded tags (e.g., Breakfast, Vegan, Quick, Healthy)
+  - 18 pre-styled tag categories with custom colors
+  - Tags displayed at the bottom of recipe cards
+  - Support for custom tags with default styling
 - **Multiple View Modes**: Switch between Compact (default), Grid, and List views
   - **Compact View**: Grid of recipe cards with images - click to expand for full details
   - **Grid View**: Full detailed recipe cards with all information visible
@@ -84,7 +88,7 @@ recipe-keeper/
    The API will be available at `http://localhost:8000`
 
 4. **Open the frontend**
-   
+
    Option 1: Open directly in browser
 ```bash
    # Simply open frontend/index.html in your browser
@@ -93,9 +97,9 @@ recipe-keeper/
    Option 2: Use a local server (recommended)
 ```bash
    cd frontend
-   python -m http.server 8080
+   python -m http.server 5500
 ```
-   Then visit `http://localhost:8080`
+   Then visit `http://localhost:5500`
 
 ## API Documentation 📚
 
@@ -116,6 +120,24 @@ Once the backend is running, visit:
 - `GET /recipes/{recipe_id}/comments` - Get all comments for a recipe
 - `POST /recipes/{recipe_id}/comments` - Add a comment to a recipe
 - `DELETE /comments/{comment_id}` - Delete a comment
+
+## Usage Guide 📖
+
+### Adding Tags to Recipes
+
+When creating or editing a recipe, you can add tags in the "Tags (Optional)" field. Simply enter tag names separated by commas:
+
+```
+Breakfast, Vegan, Quick
+```
+
+**Pre-styled Tag Categories:**
+
+- **Meal Types**: Breakfast, Lunch, Dinner, Dessert, Snack, Appetizer
+- **Dietary**: Vegan, Vegetarian, Gluten Free, Dairy Free, Keto, Paleo
+- **Characteristics**: Quick, Easy, Healthy, Comfort, Spicy, Sweet
+
+Tags are displayed as color-coded badges at the bottom of recipe cards, just above the action icons (Edit, Delete, Comments).
 
 ## Credits 🙏
 
