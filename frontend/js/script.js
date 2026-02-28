@@ -34,6 +34,53 @@ function showNoResults() {
     displayArea.innerHTML = '<div class="no-results">No recipes found matching your search.</div>';
 }
 
+// Show toast notification
+function showToast(message, type = 'success') {
+    const toastContainer = document.getElementById('toastContainer');
+    
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.classList.add('toast', type);
+    
+    // Toast icon
+    const icon = document.createElement('span');
+    icon.classList.add('toast-icon');
+    
+    // Toast message
+    const content = document.createElement('div');
+    content.classList.add('toast-content');
+    content.textContent = message;
+    
+    // Close button
+    const closeBtn = document.createElement('button');
+    closeBtn.classList.add('toast-close');
+    closeBtn.innerHTML = '×';
+    closeBtn.onclick = function() {
+        removeToast(toast);
+    };
+    
+    // Assemble toast
+    toast.appendChild(icon);
+    toast.appendChild(content);
+    toast.appendChild(closeBtn);
+    
+    // Add to container
+    toastContainer.appendChild(toast);
+    
+    // Auto-remove after 4 seconds
+    setTimeout(() => {
+        removeToast(toast);
+    }, 9000);
+}
+
+// Remove toast with animation
+function removeToast(toast) {
+    toast.classList.add('hiding');
+    setTimeout(() => {
+        toast.remove();
+    }, 300);
+}
+
 // Sort recipes based on selected option
 function sortRecipes(recipesToSort) {
     const sortOption = currentSort;
@@ -452,7 +499,7 @@ async function handleAddComment(recipeId, authorInput, commentTextarea, modal) {
     const text = commentTextarea.value.trim();
 
     if (!author || !text) {
-        alert('Please enter your name and a comment.');
+        showToast('Please enter your name and a comment.', 'warning');
         return;
     }
 
@@ -476,9 +523,9 @@ async function handleAddComment(recipeId, authorInput, commentTextarea, modal) {
         // Update comment count
         commentCounts[recipeId] = (commentCounts[recipeId] || 0) + 1;
 
-        alert('Comment added successfully!');
+        showToast('Comment added successfully!', 'success');
     } catch (error) {
-        alert('Failed to add comment. Please try again.');
+        showToast('Failed to add comment. Please try again.', 'error');
     }
 }
 
@@ -497,9 +544,9 @@ async function handleDeleteComment(commentId, recipeId, commentsList) {
         // Update comment count
         commentCounts[recipeId] = Math.max((commentCounts[recipeId] || 1) - 1, 0);
 
-        alert('Comment deleted successfully!');
+        showToast('Comment deleted successfully!', 'success');
     } catch (error) {
-        alert('Failed to delete comment. Please try again.');
+        showToast('Failed to delete comment. Please try again.', 'error');
     }
 }
 
@@ -545,11 +592,11 @@ async function handleDeleteRecipe(index) {
         // Refresh recipes from server with current search query
         const searchQuery = searchInput.value;
         await loadRecipes(searchQuery);
-        
+
         // Show success message
-        alert('Recipe deleted successfully!');
+        showToast('Recipe deleted successfully!', 'success');
     } catch (error) {
-        alert('Failed to delete recipe. Please try again.');
+        showToast('Failed to delete recipe. Please try again.', 'error');
     }
 }
 
@@ -611,7 +658,7 @@ recipeForm.addEventListener('submit', async function(event) {
     // Validation
     const validation = validateRecipeData(enteredRecipeName, enteredIngredients, enteredSteps);
     if (!validation.valid) {
-        alert(validation.message);
+        showToast(validation.message, 'error');
         return;
     }
 
@@ -641,25 +688,25 @@ recipeForm.addEventListener('submit', async function(event) {
             // Refresh recipes from server with current search query
             const searchQuery = searchInput.value;
             await loadRecipes(searchQuery);
-            
+
             // Show success message
-            alert('Recipe updated successfully!');
+            showToast('Recipe updated successfully!', 'success');
         } else {
             // Create new recipe via API
             await createRecipe(recipeData);
-            
+
             // Refresh recipes from server (clear search)
             searchInput.value = '';
             await loadRecipes();
-            
+
             // Show success message
-            alert('Recipe added successfully!');
+            showToast('Recipe added successfully!', 'success');
         }
 
         // Reset the form
         resetForm();
     } catch (error) {
-        alert('Failed to save recipe. Please try again.');
+        showToast('Failed to save recipe. Please try again.', 'error');
     }
 });
 
