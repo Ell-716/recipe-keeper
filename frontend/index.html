@@ -24,52 +24,56 @@
         <div class="sort-option" data-sort="comments-most">Most Comments</div>
     </div>
 
-    <!-- Two Column Container -->
-    <div class="container">
-        <!-- Left Column: Add Recipe Section -->
-        <div class="add-recipe-section">
-            <h2>Add Recipe</h2>
-            <form>
-                <label for="recipeName">Recipe Name</label>
-                <input type="text" id="recipeName">
+    <!-- Scrollable content area -->
+    <div class="scrollable-content">
+        <!-- Two Column Container -->
+        <div class="container">
+            <!-- Left Column: Add Recipe Section -->
+            <div class="add-recipe-section">
+                <h2>Add Recipe</h2>
+                <form>
+                    <label for="recipeName">Recipe Name</label>
+                    <input type="text" id="recipeName">
 
-                <label for="ingredients">Ingredients</label>
-                <textarea id="ingredients" placeholder="List ingredients"></textarea>
+                    <label for="ingredients">Ingredients</label>
+                    <textarea id="ingredients" placeholder="List ingredients"></textarea>
 
-                <label for="steps">Steps</label>
-                <textarea id="steps" placeholder="Steps for preparation"></textarea>
+                    <label for="steps">Steps</label>
+                    <textarea id="steps" placeholder="Steps for preparation"></textarea>
 
-                <label for="recipeImage">Recipe Image URL (Optional)</label>
-                <input type="url" id="recipeImage" placeholder="https://example.com/my-dish.jpg">
-                
-                <label for="recipeTags">Tags (Optional)</label>
-                <input type="text" id="recipeTags" placeholder="e.g., Breakfast, Vegan, Quick">
+                    <label for="recipeImage">Recipe Image URL (Optional)</label>
+                    <input type="url" id="recipeImage" placeholder="https://example.com/my-dish.jpg">
+                    
+                    <label for="recipeTags">Tags (Optional)</label>
+                    <input type="text" id="recipeTags" placeholder="e.g., Breakfast, Vegan, Quick">
+                    <small style="color: #666; font-size: 0.85rem; display: block; margin-top: -15px; margin-bottom: 15px;">
+                        Separate tags with commas. Try: Breakfast, Lunch, Dinner, Dessert, Vegan, Quick, Easy, Healthy
+                    </small>
 
-                <button type="submit">Add Recipe</button>
-            </form>
-        </div>
-
-        <!-- Right Column: Your Recipes Section -->
-        <div class="recipes-section">
-            <div class="recipes-header">
-                <h2>Your Recipes 
-                    <button id="viewButton" class="view-toggle-button">
-                        <img src="assets/down.png" alt="View options" style="width: 16px; height: 16px;">
-                    </button>
-                </h2>
-                <div id="viewMenu" class="view-menu" style="display: none;">
-                    <div class="view-option active" data-view="compact">Compact View</div>
-                    <div class="view-option" data-view="grid">Grid View</div>
-                    <div class="view-option" data-view="list">List View</div>
-                </div>
+                    <button type="submit">Add Recipe</button>
+                </form>
             </div>
-            <div id="recipeDisplay"></div>
+
+            <!-- Right Column: Your Recipes Section -->
+            <div class="recipes-section">
+                <div class="recipes-header">
+                    <h2>Your Recipes 
+                        <button id="viewButton" class="view-toggle-button">
+                            <img src="assets/down.png" alt="View options" style="width: 16px; height: 16px;">
+                        </button>
+                    </h2>
+                    <div id="viewMenu" class="view-menu" style="display: none;">
+                        <div class="view-option active" data-view="compact">Compact View</div>
+                        <div class="view-option" data-view="grid">Grid View</div>
+                        <div class="view-option" data-view="list">List View</div>
+                    </div>
+                </div>
+                <div id="recipeDisplay"></div>
+            </div>
         </div>
     </div>
-    <script src="js/api.js"></script>
-    <script src="js/validators.js"></script>
-    <script src="js/script.js"></script>
-
+    <!-- END scrollable-content -->
+    
     <!-- Toast Container -->
     <div id="toastContainer" class="toast-container"></div>
     
