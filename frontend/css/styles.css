@@ -664,7 +664,7 @@ button[type="submit"]:hover {
 
 #recipeDisplay.grid-view .recipe-card img {
     width: 100%;
-    max-height: 420px;
+    height: 300px;
     object-fit: cover;
     border-radius: 8px;
 }
@@ -703,9 +703,14 @@ button[type="submit"]:hover {
 
 #recipeDisplay.compact-view .recipe-card img {
     width: 100%;
-    max-height: 180px;
+    height: 180px;
     object-fit: cover;
     border-radius: 8px;
+}
+
+/* Placeholder in compact view matches image height */
+#recipeDisplay.compact-view .recipe-image-placeholder {
+    height: 180px;
 }
 
 /* Collapsible details in compact view */
@@ -727,9 +732,14 @@ button[type="submit"]:hover {
 
 #recipeDisplay.compact-view .recipe-card.expanded img {
     width: 100%;
-    max-height: 420px;
+    height: 300px;
     object-fit: cover;
     border-radius: 8px;
+}
+
+/* Placeholder in expanded compact view matches image height */
+#recipeDisplay.compact-view .recipe-card.expanded .recipe-image-placeholder {
+    height: 300px;
 }
 
 /* On smaller screens, expanded card spans all columns */
@@ -786,7 +796,7 @@ button[type="submit"]:hover {
 
 #recipeDisplay.list-view .recipe-card.expanded img {
     width: 100%;
-    max-height: 420px;
+    height: 300px;
     object-fit: cover;
     border-radius: 8px;
 }
@@ -802,7 +812,7 @@ button[type="submit"]:hover {
 }
 
 #recipeDisplay.list-view .recipe-card img {
-    max-height: 250px;
+    height: 300px;
     margin-bottom: 15px;
 }
 
@@ -956,4 +966,28 @@ button[type="submit"]:hover {
 
 .toast.hiding {
     animation: slideOut 0.3s ease-out forwards;
+}
+
+/* Recipe Image Placeholder */
+.recipe-image-placeholder {
+    width: 100%;
+    height: 300px;
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.recipe-image-placeholder .icon {
+    font-size: 4rem;
+    margin-bottom: 10px;
+}
+
+.recipe-image-placeholder .text {
+    font-size: 0.9rem;
+    color: #999;
+    font-family: 'Arial', sans-serif;
 }

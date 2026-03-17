@@ -128,6 +128,25 @@ async function loadRecipes(searchQuery = '') {
     }
 }
 
+// Create image placeholder when recipe has no image
+function createImagePlaceholder() {
+    let placeholder = document.createElement('div');
+    placeholder.classList.add('recipe-image-placeholder');
+
+    let icon = document.createElement('div');
+    icon.classList.add('icon');
+    icon.textContent = '🍴';
+
+    let text = document.createElement('div');
+    text.classList.add('text');
+    text.textContent = 'No image available';
+
+    placeholder.appendChild(icon);
+    placeholder.appendChild(text);
+
+    return placeholder;
+}
+
 // Display Function - Routes to appropriate view
 async function displayRecipe(recipe, index) {
     if (currentView === 'list') {
@@ -153,6 +172,9 @@ function displayRecipeGrid(recipe, index) {
         recipeImg.src = recipe.imageUrl;
         recipeImg.alt = recipe.name;
         recipeDiv.appendChild(recipeImg);
+    } else {
+        let placeholder = createImagePlaceholder();
+        recipeDiv.appendChild(placeholder);
     }
 
     let ingredientsPara = document.createElement('div');
@@ -190,6 +212,9 @@ function displayRecipeCompact(recipe, index) {
         recipeImg.src = recipe.imageUrl;
         recipeImg.alt = recipe.name;
         cardPreview.appendChild(recipeImg);
+    } else {
+        let placeholder = createImagePlaceholder();
+        cardPreview.appendChild(placeholder);
     }
 
     let nameHeading = document.createElement('h3');
@@ -256,6 +281,9 @@ function displayRecipeList(recipe, index) {
         recipeImg.src = recipe.imageUrl;
         recipeImg.alt = recipe.name;
         recipeContent.appendChild(recipeImg);
+    } else {
+        let placeholder = createImagePlaceholder();
+        recipeContent.appendChild(placeholder);
     }
 
     let ingredientsPara = document.createElement('div');
