@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Print Recipe</title>
+    <link rel="stylesheet" href="css/print.css">
+</head>
+<body>
+    <div id="printContent">
+        <h1 id="recipeName"></h1>
+
+        <div id="recipeImageContainer"></div>
+
+        <h2>Ingredients</h2>
+        <div id="recipeIngredients"></div>
+
+        <h2>Steps</h2>
+        <div id="recipeSteps"></div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/validators.js"></script>
+    <script>
+        // Get recipe data from localStorage
+        const recipeData = JSON.parse(localStorage.getItem('recipeToPrint'));
+
+        if (recipeData) {
+            // Populate recipe name
+            document.getElementById('recipeName').textContent = recipeData.name;
+
+            // Populate recipe image or placeholder
+            const imageContainer = document.getElementById('recipeImageContainer');
+            if (recipeData.imageUrl && recipeData.imageUrl.trim() !== '') {
+                const img = document.createElement('img');
+                img.src = recipeData.imageUrl;
+                img.alt = recipeData.name;
+                imageContainer.appendChild(img);
+            } else {
+                const placeholder = document.createElement('div');
+                placeholder.classList.add('placeholder');
+                placeholder.innerHTML = `
+                    <div class="icon">🍴</div>
+                    <div class="text">No image available</div>
+                `;
+                imageContainer.appendChild(placeholder);
+            }
+
+            // Populate ingredients (extract just the ul element)
+            const ingredientsHTML = formatIngredientsList(recipeData.ingredients);
+            const tempIngredients = document.createElement('div');
+            tempIngredients.innerHTML = ingredientsHTML;
+            const ingredientsList = tempIngredients.querySelector('ul');
+            if (ingredientsList) {
+                document.getElementById('recipeIngredients').appendChild(ingredientsList);
+            }
+
+            // Populate steps (extract just the ol element)
+            const stepsHTML = formatStepsList(recipeData.steps);
+            const tempSteps = document.createElement('div');
+            tempSteps.innerHTML = stepsHTML;
+            const stepsList = tempSteps.querySelector('ol');
+            if (stepsList) {
+                document.getElementById('recipeSteps').appendChild(stepsList);
+            }
+
+            // Clear localStorage
+            localStorage.removeItem('recipeToPrint');
+
+            // Trigger print dialog after content loads
+            window.onload = function() {
+                window.print();
+            };
+        } else {
+            document.body.innerHTML = '<p style="text-align: center; padding: 50px;">No recipe data found.</p>';
+        }
+    </script>
+</body>
+</html>

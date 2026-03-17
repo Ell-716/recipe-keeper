@@ -24,17 +24,26 @@ let editIndex = -1;
 // Track comment counts for sorting
 let commentCounts = {};
 
-// Show error message
+/**
+ * Displays an error message in the recipe display area
+ * @param {string} message - The error message to display
+ */
 function showError(message) {
     displayArea.innerHTML = `<div class="error-message">${message}</div>`;
 }
 
-// Show no results message
+/**
+ * Displays a "no results" message when search returns no recipes
+ */
 function showNoResults() {
     displayArea.innerHTML = '<div class="no-results">No recipes found matching your search.</div>';
 }
 
-// Show toast notification
+/**
+ * Shows a toast notification with a message
+ * @param {string} message - The message to display in the toast
+ * @param {string} type - The type of toast (success, error, warning, info)
+ */
 function showToast(message, type = 'success') {
     const toastContainer = document.getElementById('toastContainer');
     
@@ -73,7 +82,10 @@ function showToast(message, type = 'success') {
     }, 9000);
 }
 
-// Remove toast with animation
+/**
+ * Removes a toast notification with animation
+ * @param {HTMLElement} toast - The toast element to remove
+ */
 function removeToast(toast) {
     toast.classList.add('hiding');
     setTimeout(() => {
@@ -81,7 +93,11 @@ function removeToast(toast) {
     }, 300);
 }
 
-// Sort recipes based on selected option
+/**
+ * Sorts recipes based on the current sort option
+ * @param {Array} recipesToSort - Array of recipe objects to sort
+ * @returns {Array} Sorted array of recipes
+ */
 function sortRecipes(recipesToSort) {
     const sortOption = currentSort;
     let sorted = [...recipesToSort]; // Create a copy
@@ -111,7 +127,10 @@ function sortRecipes(recipesToSort) {
     return sorted;
 }
 
-// Load and display recipes (with optional search)
+/**
+ * Loads and displays recipes from the API with optional search filtering
+ * @param {string} searchQuery - Optional search query to filter recipes
+ */
 async function loadRecipes(searchQuery = '') {
     try {
         recipes = await fetchRecipes(searchQuery);
@@ -128,7 +147,10 @@ async function loadRecipes(searchQuery = '') {
     }
 }
 
-// Create image placeholder when recipe has no image
+/**
+ * Creates a placeholder element for recipes without images
+ * @returns {HTMLElement} A div element styled as an image placeholder
+ */
 function createImagePlaceholder() {
     let placeholder = document.createElement('div');
     placeholder.classList.add('recipe-image-placeholder');
@@ -147,7 +169,23 @@ function createImagePlaceholder() {
     return placeholder;
 }
 
-// Display Function - Routes to appropriate view
+/**
+ * Opens a printer-friendly view of a recipe in a new window
+ * @param {Object} recipe - The recipe object to print
+ */
+function printRecipe(recipe) {
+    // Store recipe data in localStorage for the print page to access
+    localStorage.setItem('recipeToPrint', JSON.stringify(recipe));
+
+    // Open print page in new window
+    window.open('print-recipe.html', '_blank');
+}
+
+/**
+ * Routes recipe display to the appropriate view function based on current view mode
+ * @param {Object} recipe - The recipe object to display
+ * @param {number} index - The index of the recipe in the recipes array
+ */
 async function displayRecipe(recipe, index) {
     if (currentView === 'list') {
         displayRecipeList(recipe, index);
@@ -158,7 +196,11 @@ async function displayRecipe(recipe, index) {
     }
 }
 
-// Grid View (original full display)
+/**
+ * Displays a recipe in grid view (full card with all details visible)
+ * @param {Object} recipe - The recipe object to display
+ * @param {number} index - The index of the recipe in the recipes array
+ */
 function displayRecipeGrid(recipe, index) {
     let recipeDiv = document.createElement('div');
     recipeDiv.classList.add('recipe-card');
@@ -197,7 +239,11 @@ function displayRecipeGrid(recipe, index) {
     displayArea.appendChild(recipeDiv);
 }
 
-// Compact View (grid of small cards that expand on click)
+/**
+ * Displays a recipe in compact view (small cards that expand on click)
+ * @param {Object} recipe - The recipe object to display
+ * @param {number} index - The index of the recipe in the recipes array
+ */
 function displayRecipeCompact(recipe, index) {
     let recipeDiv = document.createElement('div');
     recipeDiv.classList.add('recipe-card');
@@ -253,7 +299,11 @@ function displayRecipeCompact(recipe, index) {
     displayArea.appendChild(recipeDiv);
 }
 
-// List View (accordion/collapsible)
+/**
+ * Displays a recipe in list view (accordion/collapsible style)
+ * @param {Object} recipe - The recipe object to display
+ * @param {number} index - The index of the recipe in the recipes array
+ */
 function displayRecipeList(recipe, index) {
     let recipeDiv = document.createElement('div');
     recipeDiv.classList.add('recipe-card');
@@ -314,7 +364,12 @@ function displayRecipeList(recipe, index) {
     displayArea.appendChild(recipeDiv);
 }
 
-// Helper function to create action icons (reusable)
+/**
+ * Helper function to create action icons for a recipe card
+ * @param {Object} recipe - The recipe object
+ * @param {number} index - The index of the recipe in the recipes array
+ * @returns {HTMLElement} A div element containing action buttons
+ */
 function createActionIcons(recipe, index) {
     let actionIcons = document.createElement('div');
     actionIcons.classList.add('action-icons');
@@ -342,7 +397,7 @@ function createActionIcons(recipe, index) {
     commentIconContainer.classList.add('icon-button', 'comment-icon');
     commentIconContainer.innerHTML = '<img src="assets/chat.png" alt="Comments" style="width: 24px; height: 24px;">';
     commentIconContainer.title = 'View comments';
-    
+
     const commentCount = recipe.comment_count || 0;
     if (commentCount > 0) {
         let commentCountBadge = document.createElement('span');
@@ -350,19 +405,33 @@ function createActionIcons(recipe, index) {
         commentCountBadge.textContent = commentCount;
         commentIconContainer.appendChild(commentCountBadge);
     }
-    
+
     commentIconContainer.onclick = function() {
         openCommentsModal(recipe.id, recipe.name);
+    };
+
+    // Print icon
+    let printIcon = document.createElement('button');
+    printIcon.classList.add('icon-button', 'print-icon');
+    printIcon.innerHTML = '<img src="assets/print.png" alt="Print" style="width: 24px; height: 24px;">';
+    printIcon.title = 'Print recipe';
+    printIcon.onclick = function() {
+        printRecipe(recipe);
     };
 
     actionIcons.appendChild(editIcon);
     actionIcons.appendChild(deleteIcon);
     actionIcons.appendChild(commentIconContainer);
+    actionIcons.appendChild(printIcon);
 
     return actionIcons;
 }
 
-// Helper function to create tag badges
+/**
+ * Creates colored tag badges for a recipe
+ * @param {Array} tags - Array of tag strings
+ * @returns {HTMLElement} A div element containing tag badges
+ */
 function createTagBadges(tags) {
     if (!tags || tags.length === 0) return '';
     
@@ -396,7 +465,11 @@ function createTagBadges(tags) {
     return tagsContainer;
 }
 
-// Open comments modal
+/**
+ * Opens a modal dialog for viewing and adding comments to a recipe
+ * @param {number} recipeId - The ID of the recipe
+ * @param {string} recipeName - The name of the recipe
+ */
 async function openCommentsModal(recipeId, recipeName) {
     // Create modal overlay
     let modal = document.createElement('div');
@@ -466,14 +539,21 @@ async function openCommentsModal(recipeId, recipeName) {
     document.body.appendChild(modal);
 }
 
-// Close comments modal
+/**
+ * Closes the comments modal and refreshes the recipe display
+ * @param {HTMLElement} modal - The modal element to close
+ */
 function closeCommentsModal(modal) {
     modal.remove();
     // Refresh the recipe display to update comment counts
     loadRecipes(searchInput.value);
 }
 
-// Load comments in modal
+/**
+ * Loads and displays comments for a recipe in the modal
+ * @param {number} recipeId - The ID of the recipe
+ * @param {HTMLElement} commentsList - The container element for comments
+ */
 async function loadCommentsInModal(recipeId, commentsList) {
     try {
         const comments = await getComments(recipeId);
@@ -521,7 +601,13 @@ async function loadCommentsInModal(recipeId, commentsList) {
     }
 }
 
-// Handle adding a comment
+/**
+ * Handles adding a new comment to a recipe
+ * @param {number} recipeId - The ID of the recipe
+ * @param {HTMLInputElement} authorInput - The input element for author name
+ * @param {HTMLTextAreaElement} commentTextarea - The textarea element for comment text
+ * @param {HTMLElement} modal - The modal element
+ */
 async function handleAddComment(recipeId, authorInput, commentTextarea, modal) {
     const author = authorInput.value.trim();
     const text = commentTextarea.value.trim();
@@ -557,7 +643,12 @@ async function handleAddComment(recipeId, authorInput, commentTextarea, modal) {
     }
 }
 
-// Handle deleting a comment
+/**
+ * Handles deleting a comment from a recipe
+ * @param {number} commentId - The ID of the comment to delete
+ * @param {number} recipeId - The ID of the recipe
+ * @param {HTMLElement} commentsList - The container element for comments
+ */
 async function handleDeleteComment(commentId, recipeId, commentsList) {
     if (!confirm('Are you sure you want to delete this comment?')) {
         return;
@@ -578,7 +669,10 @@ async function handleDeleteComment(commentId, recipeId, commentsList) {
     }
 }
 
-// Edit Function
+/**
+ * Populates the form with recipe data for editing
+ * @param {number} index - The index of the recipe to edit in the recipes array
+ */
 function editRecipe(index) {
     // Get the recipe to edit
     let recipe = recipes[index];
@@ -603,7 +697,10 @@ function editRecipe(index) {
     recipeForm.scrollIntoView({ behavior: 'smooth' });
 }
 
-// Delete Function
+/**
+ * Handles deleting a recipe after user confirmation
+ * @param {number} index - The index of the recipe to delete in the recipes array
+ */
 async function handleDeleteRecipe(index) {
     if (!confirm('Are you sure you want to delete this recipe?')) {
         return;
@@ -628,7 +725,9 @@ async function handleDeleteRecipe(index) {
     }
 }
 
-// Refresh Display Function (helper to redisplay all recipes)
+/**
+ * Refreshes the recipe display area with sorted recipes in the current view mode
+ */
 async function refreshDisplay() {
     // Update view class
     displayArea.className = `${currentView}-view`;
@@ -657,7 +756,9 @@ async function refreshDisplay() {
     }
 }
 
-// Reset Form Function
+/**
+ * Resets the recipe form to its default state
+ */
 function resetForm() {
     recipeName.value = '';
     ingredients.value = '';

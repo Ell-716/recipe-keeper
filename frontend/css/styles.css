@@ -315,6 +315,10 @@ button[type="submit"]:hover {
     position: relative;
 }
 
+.print-icon {
+    color: #000;
+}
+
 .comment-count {
     position: absolute;
     top: -5px;

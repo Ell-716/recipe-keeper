@@ -16,8 +16,17 @@ A full-stack web application for storing and managing your favorite recipes with
 - **Search Functionality**: Real-time search across recipe names, ingredients, and steps
 - **Advanced Sorting**: Sort recipes by name (A-Z, Z-A), date added (newest/oldest), or number of comments
 - **Comment System**: Add and delete comments on recipes with a modal interface
+- **Print Recipe**: Print any recipe or save as PDF with a clean, printer-friendly layout
+  - Click the print icon on any recipe card
+  - Optimized A4 page formatting
+  - Includes recipe name, image, ingredients list, and steps
+  - Works with "Save as PDF" or direct printing
+- **Image Placeholder**: Recipes without images display a styled placeholder
+  - Light gray background with fork and knife icon
+  - "No image available" text
+  - Consistent sizing across all view modes
 - **Responsive Design**: Clean, professional UI with background imagery
-- **Icon-based Actions**: Intuitive edit, delete, and comment icons
+- **Icon-based Actions**: Intuitive edit, delete, comment, and print icons
 - **Recipe Display**: Beautiful recipe cards with images, formatted ingredients, and step-by-step instructions
 
 ## Tech Stack 🛠️
@@ -43,8 +52,10 @@ recipe-keeper/
 │   └── comments.json       # Comments data storage
 ├── frontend/
 │   ├── index.html          # Main HTML file
+│   ├── print-recipe.html   # Print-friendly recipe page
 │   ├── css/
-│   │   └── styles.css      # Styles
+│   │   ├── styles.css      # Main styles
+│   │   └── print.css       # Print-specific styles
 │   ├── js/
 │   │   ├── api.js          # API functions
 │   │   ├── validators.js   # Validation & formatting
@@ -53,6 +64,7 @@ recipe-keeper/
 │       ├── bin.png         # Delete icon
 │       ├── edit-text.png   # Edit icon
 │       ├── chat.png        # Comment icon
+│       ├── print.png       # Print icon
 │       ├── search.png      # Search icon
 │       ├── filter.png      # Sort/filter icon
 │       └── down.png        # Dropdown arrow icon
