@@ -24,17 +24,26 @@ let editIndex = -1;
 // Track comment counts for sorting
 let commentCounts = {};
 
-// Show error message
+/**
+ * Displays an error message in the recipe display area
+ * @param {string} message - The error message to display
+ */
 function showError(message) {
     displayArea.innerHTML = `<div class="error-message">${message}</div>`;
 }
 
-// Show no results message
+/**
+ * Displays a "no results" message when search returns no recipes
+ */
 function showNoResults() {
     displayArea.innerHTML = '<div class="no-results">No recipes found matching your search.</div>';
 }
 
-// Show toast notification
+/**
+ * Shows a toast notification with a message
+ * @param {string} message - The message to display in the toast
+ * @param {string} type - The type of toast (success, error, warning, info)
+ */
 function showToast(message, type = 'success') {
     const toastContainer = document.getElementById('toastContainer');
     
@@ -73,7 +82,10 @@ function showToast(message, type = 'success') {
     }, 9000);
 }
 
-// Remove toast with animation
+/**
+ * Removes a toast notification with animation
+ * @param {HTMLElement} toast - The toast element to remove
+ */
 function removeToast(toast) {
     toast.classList.add('hiding');
     setTimeout(() => {
@@ -81,7 +93,11 @@ function removeToast(toast) {
     }, 300);
 }
 
-// Sort recipes based on selected option
+/**
+ * Sorts recipes based on the current sort option
+ * @param {Array} recipesToSort - Array of recipe objects to sort
+ * @returns {Array} Sorted array of recipes
+ */
 function sortRecipes(recipesToSort) {
     const sortOption = currentSort;
     let sorted = [...recipesToSort]; // Create a copy
@@ -111,7 +127,10 @@ function sortRecipes(recipesToSort) {
     return sorted;
 }
 
-// Load and display recipes (with optional search)
+/**
+ * Loads and displays recipes from the API with optional search filtering
+ * @param {string} searchQuery - Optional search query to filter recipes
+ */
 async function loadRecipes(searchQuery = '') {
     try {
         recipes = await fetchRecipes(searchQuery);
@@ -128,7 +147,189 @@ async function loadRecipes(searchQuery = '') {
     }
 }
 
-// Display Function - Routes to appropriate view
+/**
+ * Creates a placeholder element for recipes without images
+ * @returns {HTMLElement} A div element styled as an image placeholder
+ */
+function createImagePlaceholder() {
+    let placeholder = document.createElement('div');
+    placeholder.classList.add('recipe-image-placeholder');
+
+    let icon = document.createElement('div');
+    icon.classList.add('icon');
+    icon.textContent = '🍴';
+
+    let text = document.createElement('div');
+    text.classList.add('text');
+    text.textContent = 'No image available';
+
+    placeholder.appendChild(icon);
+    placeholder.appendChild(text);
+
+    return placeholder;
+}
+
+/**
+ * Opens a printer-friendly view of a recipe in a new window
+ * @param {Object} recipe - The recipe object to print
+ */
+function printRecipe(recipe) {
+    // Store recipe data in localStorage for the print page to access
+    localStorage.setItem('recipeToPrint', JSON.stringify(recipe));
+
+    // Open print page in new window
+    window.open('print-recipe.html', '_blank');
+}
+
+/**
+ * Exports a recipe to PDF and downloads it
+ * @param {Object} recipe - The recipe object to export
+ */
+function exportRecipeToPDF(recipe) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p', 'mm', 'a4');
+
+    const pageWidth = 210;
+    const margin = 20;
+    const contentWidth = pageWidth - (margin * 2);
+
+    // Generate filename
+    const filename = recipe.name.toLowerCase().replace(/\s+/g, '-') + '.pdf';
+
+    // Function to add content to PDF
+    function addContentToPDF(yPosition) {
+        // Title
+        doc.setFontSize(24);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(74, 124, 89); // #4a7c59
+        const titleLines = doc.splitTextToSize(recipe.name, contentWidth);
+        doc.text(titleLines, pageWidth / 2, yPosition, { align: 'center' });
+        yPosition += (titleLines.length * 10) + 10;
+
+        return yPosition;
+    }
+
+    // Function to add ingredients and steps
+    function addIngredientsAndSteps(yPosition) {
+        // Ingredients heading
+        doc.setFontSize(16);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(26, 26, 26); // #1a1a1a
+        doc.text('Ingredients', margin, yPosition);
+        yPosition += 3;
+
+        // Underline for heading
+        doc.setDrawColor(74, 124, 89);
+        doc.setLineWidth(0.5);
+        doc.line(margin, yPosition, margin + 40, yPosition);
+        yPosition += 10;
+
+        // Ingredients list
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(51, 51, 51); // #333
+
+        const ingredientsList = recipe.ingredients.split('\n').filter(item => item.trim() !== '');
+        ingredientsList.forEach(ingredient => {
+            if (yPosition > 270) {
+                doc.addPage();
+                yPosition = margin;
+            }
+            const lines = doc.splitTextToSize('• ' + ingredient.trim(), contentWidth - 5);
+            doc.text(lines, margin + 5, yPosition);
+            yPosition += (lines.length * 6) + 2;
+        });
+
+        yPosition += 10;
+
+        // Steps heading
+        if (yPosition > 250) {
+            doc.addPage();
+            yPosition = margin;
+        }
+
+        doc.setFontSize(16);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(26, 26, 26);
+        doc.text('Steps', margin, yPosition);
+        yPosition += 3;
+
+        // Underline for heading
+        doc.setDrawColor(74, 124, 89);
+        doc.line(margin, yPosition, margin + 25, yPosition);
+        yPosition += 10;
+
+        // Steps list
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(51, 51, 51);
+
+        const stepsList = recipe.steps.split('\n').filter(item => item.trim() !== '');
+        stepsList.forEach((step, index) => {
+            if (yPosition > 270) {
+                doc.addPage();
+                yPosition = margin;
+            }
+            const stepText = (index + 1) + '. ' + step.trim();
+            const lines = doc.splitTextToSize(stepText, contentWidth - 5);
+            doc.text(lines, margin + 5, yPosition);
+            yPosition += (lines.length * 6) + 4;
+        });
+
+        // Save the PDF
+        doc.save(filename);
+    }
+
+    // Start with title
+    let yPosition = margin;
+    yPosition = addContentToPDF(yPosition);
+
+    // Check if recipe has an image
+    if (recipe.imageUrl && recipe.imageUrl.trim() !== '') {
+        // Load image and add to PDF
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = function() {
+            // Calculate image dimensions (max width 170mm, maintain aspect ratio)
+            const maxWidth = 170;
+            const maxHeight = 80;
+            let imgWidth = maxWidth;
+            let imgHeight = (img.height / img.width) * imgWidth;
+
+            if (imgHeight > maxHeight) {
+                imgHeight = maxHeight;
+                imgWidth = (img.width / img.height) * imgHeight;
+            }
+
+            // Center the image
+            const imgX = (pageWidth - imgWidth) / 2;
+
+            try {
+                doc.addImage(img, 'JPEG', imgX, yPosition, imgWidth, imgHeight);
+                yPosition += imgHeight + 15;
+            } catch (e) {
+                // If image fails to add, continue without it
+                console.log('Could not add image to PDF');
+            }
+
+            addIngredientsAndSteps(yPosition);
+        };
+        img.onerror = function() {
+            // If image fails to load, continue without it
+            addIngredientsAndSteps(yPosition);
+        };
+        img.src = recipe.imageUrl;
+    } else {
+        // No image, just add ingredients and steps
+        addIngredientsAndSteps(yPosition);
+    }
+}
+
+/**
+ * Routes recipe display to the appropriate view function based on current view mode
+ * @param {Object} recipe - The recipe object to display
+ * @param {number} index - The index of the recipe in the recipes array
+ */
 async function displayRecipe(recipe, index) {
     if (currentView === 'list') {
         displayRecipeList(recipe, index);
@@ -139,7 +340,11 @@ async function displayRecipe(recipe, index) {
     }
 }
 
-// Grid View (original full display)
+/**
+ * Displays a recipe in grid view (full card with all details visible)
+ * @param {Object} recipe - The recipe object to display
+ * @param {number} index - The index of the recipe in the recipes array
+ */
 function displayRecipeGrid(recipe, index) {
     let recipeDiv = document.createElement('div');
     recipeDiv.classList.add('recipe-card');
@@ -153,6 +358,9 @@ function displayRecipeGrid(recipe, index) {
         recipeImg.src = recipe.imageUrl;
         recipeImg.alt = recipe.name;
         recipeDiv.appendChild(recipeImg);
+    } else {
+        let placeholder = createImagePlaceholder();
+        recipeDiv.appendChild(placeholder);
     }
 
     let ingredientsPara = document.createElement('div');
@@ -175,7 +383,11 @@ function displayRecipeGrid(recipe, index) {
     displayArea.appendChild(recipeDiv);
 }
 
-// Compact View (grid of small cards that expand on click)
+/**
+ * Displays a recipe in compact view (small cards that expand on click)
+ * @param {Object} recipe - The recipe object to display
+ * @param {number} index - The index of the recipe in the recipes array
+ */
 function displayRecipeCompact(recipe, index) {
     let recipeDiv = document.createElement('div');
     recipeDiv.classList.add('recipe-card');
@@ -190,6 +402,9 @@ function displayRecipeCompact(recipe, index) {
         recipeImg.src = recipe.imageUrl;
         recipeImg.alt = recipe.name;
         cardPreview.appendChild(recipeImg);
+    } else {
+        let placeholder = createImagePlaceholder();
+        cardPreview.appendChild(placeholder);
     }
 
     let nameHeading = document.createElement('h3');
@@ -228,7 +443,11 @@ function displayRecipeCompact(recipe, index) {
     displayArea.appendChild(recipeDiv);
 }
 
-// List View (accordion/collapsible)
+/**
+ * Displays a recipe in list view (accordion/collapsible style)
+ * @param {Object} recipe - The recipe object to display
+ * @param {number} index - The index of the recipe in the recipes array
+ */
 function displayRecipeList(recipe, index) {
     let recipeDiv = document.createElement('div');
     recipeDiv.classList.add('recipe-card');
@@ -256,6 +475,9 @@ function displayRecipeList(recipe, index) {
         recipeImg.src = recipe.imageUrl;
         recipeImg.alt = recipe.name;
         recipeContent.appendChild(recipeImg);
+    } else {
+        let placeholder = createImagePlaceholder();
+        recipeContent.appendChild(placeholder);
     }
 
     let ingredientsPara = document.createElement('div');
@@ -286,7 +508,12 @@ function displayRecipeList(recipe, index) {
     displayArea.appendChild(recipeDiv);
 }
 
-// Helper function to create action icons (reusable)
+/**
+ * Helper function to create action icons for a recipe card
+ * @param {Object} recipe - The recipe object
+ * @param {number} index - The index of the recipe in the recipes array
+ * @returns {HTMLElement} A div element containing action buttons
+ */
 function createActionIcons(recipe, index) {
     let actionIcons = document.createElement('div');
     actionIcons.classList.add('action-icons');
@@ -314,7 +541,7 @@ function createActionIcons(recipe, index) {
     commentIconContainer.classList.add('icon-button', 'comment-icon');
     commentIconContainer.innerHTML = '<img src="assets/chat.png" alt="Comments" style="width: 24px; height: 24px;">';
     commentIconContainer.title = 'View comments';
-    
+
     const commentCount = recipe.comment_count || 0;
     if (commentCount > 0) {
         let commentCountBadge = document.createElement('span');
@@ -322,19 +549,43 @@ function createActionIcons(recipe, index) {
         commentCountBadge.textContent = commentCount;
         commentIconContainer.appendChild(commentCountBadge);
     }
-    
+
     commentIconContainer.onclick = function() {
         openCommentsModal(recipe.id, recipe.name);
+    };
+
+    // Print icon
+    let printIcon = document.createElement('button');
+    printIcon.classList.add('icon-button', 'print-icon');
+    printIcon.innerHTML = '<img src="assets/print.png" alt="Print" style="width: 24px; height: 24px;">';
+    printIcon.title = 'Print recipe';
+    printIcon.onclick = function() {
+        printRecipe(recipe);
+    };
+
+    // Download PDF icon
+    let downloadIcon = document.createElement('button');
+    downloadIcon.classList.add('icon-button', 'download-icon');
+    downloadIcon.innerHTML = '<img src="assets/download.png" alt="Download PDF" style="width: 24px; height: 24px;">';
+    downloadIcon.title = 'Download as PDF';
+    downloadIcon.onclick = function() {
+        exportRecipeToPDF(recipe);
     };
 
     actionIcons.appendChild(editIcon);
     actionIcons.appendChild(deleteIcon);
     actionIcons.appendChild(commentIconContainer);
+    actionIcons.appendChild(printIcon);
+    actionIcons.appendChild(downloadIcon);
 
     return actionIcons;
 }
 
-// Helper function to create tag badges
+/**
+ * Creates colored tag badges for a recipe
+ * @param {Array} tags - Array of tag strings
+ * @returns {HTMLElement} A div element containing tag badges
+ */
 function createTagBadges(tags) {
     if (!tags || tags.length === 0) return '';
     
@@ -368,7 +619,11 @@ function createTagBadges(tags) {
     return tagsContainer;
 }
 
-// Open comments modal
+/**
+ * Opens a modal dialog for viewing and adding comments to a recipe
+ * @param {number} recipeId - The ID of the recipe
+ * @param {string} recipeName - The name of the recipe
+ */
 async function openCommentsModal(recipeId, recipeName) {
     // Create modal overlay
     let modal = document.createElement('div');
@@ -438,14 +693,21 @@ async function openCommentsModal(recipeId, recipeName) {
     document.body.appendChild(modal);
 }
 
-// Close comments modal
+/**
+ * Closes the comments modal and refreshes the recipe display
+ * @param {HTMLElement} modal - The modal element to close
+ */
 function closeCommentsModal(modal) {
     modal.remove();
     // Refresh the recipe display to update comment counts
     loadRecipes(searchInput.value);
 }
 
-// Load comments in modal
+/**
+ * Loads and displays comments for a recipe in the modal
+ * @param {number} recipeId - The ID of the recipe
+ * @param {HTMLElement} commentsList - The container element for comments
+ */
 async function loadCommentsInModal(recipeId, commentsList) {
     try {
         const comments = await getComments(recipeId);
@@ -493,7 +755,13 @@ async function loadCommentsInModal(recipeId, commentsList) {
     }
 }
 
-// Handle adding a comment
+/**
+ * Handles adding a new comment to a recipe
+ * @param {number} recipeId - The ID of the recipe
+ * @param {HTMLInputElement} authorInput - The input element for author name
+ * @param {HTMLTextAreaElement} commentTextarea - The textarea element for comment text
+ * @param {HTMLElement} modal - The modal element
+ */
 async function handleAddComment(recipeId, authorInput, commentTextarea, modal) {
     const author = authorInput.value.trim();
     const text = commentTextarea.value.trim();
@@ -529,7 +797,12 @@ async function handleAddComment(recipeId, authorInput, commentTextarea, modal) {
     }
 }
 
-// Handle deleting a comment
+/**
+ * Handles deleting a comment from a recipe
+ * @param {number} commentId - The ID of the comment to delete
+ * @param {number} recipeId - The ID of the recipe
+ * @param {HTMLElement} commentsList - The container element for comments
+ */
 async function handleDeleteComment(commentId, recipeId, commentsList) {
     if (!confirm('Are you sure you want to delete this comment?')) {
         return;
@@ -550,7 +823,10 @@ async function handleDeleteComment(commentId, recipeId, commentsList) {
     }
 }
 
-// Edit Function
+/**
+ * Populates the form with recipe data for editing
+ * @param {number} index - The index of the recipe to edit in the recipes array
+ */
 function editRecipe(index) {
     // Get the recipe to edit
     let recipe = recipes[index];
@@ -575,7 +851,10 @@ function editRecipe(index) {
     recipeForm.scrollIntoView({ behavior: 'smooth' });
 }
 
-// Delete Function
+/**
+ * Handles deleting a recipe after user confirmation
+ * @param {number} index - The index of the recipe to delete in the recipes array
+ */
 async function handleDeleteRecipe(index) {
     if (!confirm('Are you sure you want to delete this recipe?')) {
         return;
@@ -600,7 +879,9 @@ async function handleDeleteRecipe(index) {
     }
 }
 
-// Refresh Display Function (helper to redisplay all recipes)
+/**
+ * Refreshes the recipe display area with sorted recipes in the current view mode
+ */
 async function refreshDisplay() {
     // Update view class
     displayArea.className = `${currentView}-view`;
@@ -629,7 +910,9 @@ async function refreshDisplay() {
     }
 }
 
-// Reset Form Function
+/**
+ * Resets the recipe form to its default state
+ */
 function resetForm() {
     recipeName.value = '';
     ingredients.value = '';
