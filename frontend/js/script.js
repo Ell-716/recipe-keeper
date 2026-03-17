@@ -182,6 +182,150 @@ function printRecipe(recipe) {
 }
 
 /**
+ * Exports a recipe to PDF and downloads it
+ * @param {Object} recipe - The recipe object to export
+ */
+function exportRecipeToPDF(recipe) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p', 'mm', 'a4');
+
+    const pageWidth = 210;
+    const margin = 20;
+    const contentWidth = pageWidth - (margin * 2);
+
+    // Generate filename
+    const filename = recipe.name.toLowerCase().replace(/\s+/g, '-') + '.pdf';
+
+    // Function to add content to PDF
+    function addContentToPDF(yPosition) {
+        // Title
+        doc.setFontSize(24);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(74, 124, 89); // #4a7c59
+        const titleLines = doc.splitTextToSize(recipe.name, contentWidth);
+        doc.text(titleLines, pageWidth / 2, yPosition, { align: 'center' });
+        yPosition += (titleLines.length * 10) + 10;
+
+        return yPosition;
+    }
+
+    // Function to add ingredients and steps
+    function addIngredientsAndSteps(yPosition) {
+        // Ingredients heading
+        doc.setFontSize(16);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(26, 26, 26); // #1a1a1a
+        doc.text('Ingredients', margin, yPosition);
+        yPosition += 3;
+
+        // Underline for heading
+        doc.setDrawColor(74, 124, 89);
+        doc.setLineWidth(0.5);
+        doc.line(margin, yPosition, margin + 40, yPosition);
+        yPosition += 10;
+
+        // Ingredients list
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(51, 51, 51); // #333
+
+        const ingredientsList = recipe.ingredients.split('\n').filter(item => item.trim() !== '');
+        ingredientsList.forEach(ingredient => {
+            if (yPosition > 270) {
+                doc.addPage();
+                yPosition = margin;
+            }
+            const lines = doc.splitTextToSize('• ' + ingredient.trim(), contentWidth - 5);
+            doc.text(lines, margin + 5, yPosition);
+            yPosition += (lines.length * 6) + 2;
+        });
+
+        yPosition += 10;
+
+        // Steps heading
+        if (yPosition > 250) {
+            doc.addPage();
+            yPosition = margin;
+        }
+
+        doc.setFontSize(16);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(26, 26, 26);
+        doc.text('Steps', margin, yPosition);
+        yPosition += 3;
+
+        // Underline for heading
+        doc.setDrawColor(74, 124, 89);
+        doc.line(margin, yPosition, margin + 25, yPosition);
+        yPosition += 10;
+
+        // Steps list
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(51, 51, 51);
+
+        const stepsList = recipe.steps.split('\n').filter(item => item.trim() !== '');
+        stepsList.forEach((step, index) => {
+            if (yPosition > 270) {
+                doc.addPage();
+                yPosition = margin;
+            }
+            const stepText = (index + 1) + '. ' + step.trim();
+            const lines = doc.splitTextToSize(stepText, contentWidth - 5);
+            doc.text(lines, margin + 5, yPosition);
+            yPosition += (lines.length * 6) + 4;
+        });
+
+        // Save the PDF
+        doc.save(filename);
+    }
+
+    // Start with title
+    let yPosition = margin;
+    yPosition = addContentToPDF(yPosition);
+
+    // Check if recipe has an image
+    if (recipe.imageUrl && recipe.imageUrl.trim() !== '') {
+        // Load image and add to PDF
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = function() {
+            // Calculate image dimensions (max width 170mm, maintain aspect ratio)
+            const maxWidth = 170;
+            const maxHeight = 80;
+            let imgWidth = maxWidth;
+            let imgHeight = (img.height / img.width) * imgWidth;
+
+            if (imgHeight > maxHeight) {
+                imgHeight = maxHeight;
+                imgWidth = (img.width / img.height) * imgHeight;
+            }
+
+            // Center the image
+            const imgX = (pageWidth - imgWidth) / 2;
+
+            try {
+                doc.addImage(img, 'JPEG', imgX, yPosition, imgWidth, imgHeight);
+                yPosition += imgHeight + 15;
+            } catch (e) {
+                // If image fails to add, continue without it
+                console.log('Could not add image to PDF');
+            }
+
+            addIngredientsAndSteps(yPosition);
+        };
+        img.onerror = function() {
+            // If image fails to load, continue without it
+            addIngredientsAndSteps(yPosition);
+        };
+        img.src = recipe.imageUrl;
+    } else {
+        // No image, just add ingredients and steps
+        addIngredientsAndSteps(yPosition);
+    }
+}
+
+/**
  * Routes recipe display to the appropriate view function based on current view mode
  * @param {Object} recipe - The recipe object to display
  * @param {number} index - The index of the recipe in the recipes array
@@ -419,10 +563,20 @@ function createActionIcons(recipe, index) {
         printRecipe(recipe);
     };
 
+    // Download PDF icon
+    let downloadIcon = document.createElement('button');
+    downloadIcon.classList.add('icon-button', 'download-icon');
+    downloadIcon.innerHTML = '<img src="assets/download.png" alt="Download PDF" style="width: 24px; height: 24px;">';
+    downloadIcon.title = 'Download as PDF';
+    downloadIcon.onclick = function() {
+        exportRecipeToPDF(recipe);
+    };
+
     actionIcons.appendChild(editIcon);
     actionIcons.appendChild(deleteIcon);
     actionIcons.appendChild(commentIconContainer);
     actionIcons.appendChild(printIcon);
+    actionIcons.appendChild(downloadIcon);
 
     return actionIcons;
 }

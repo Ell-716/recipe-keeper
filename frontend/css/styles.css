@@ -319,6 +319,10 @@ button[type="submit"]:hover {
     color: #000;
 }
 
+.download-icon {
+    color: #4a7c59;
+}
+
 .comment-count {
     position: absolute;
     top: -5px;
