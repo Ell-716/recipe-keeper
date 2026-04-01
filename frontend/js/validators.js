@@ -1,3 +1,16 @@
+// Function to sanitize HTML to prevent XSS attacks
+function sanitizeHTML(text) {
+    if (text === null || text === undefined) {
+        return '';
+    }
+    return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#x27;');
+}
+
 // Function to capitalize recipe name
 function capitalizeRecipeName(name) {
     return name

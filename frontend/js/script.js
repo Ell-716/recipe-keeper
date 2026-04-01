@@ -34,9 +34,14 @@ function showError(message) {
 
 /**
  * Displays a "no results" message when search returns no recipes
+ * @param {string} searchQuery - The search query that returned no results
  */
-function showNoResults() {
-    displayArea.innerHTML = '<div class="no-results">No recipes found matching your search.</div>';
+function showNoResults(searchQuery) {
+    const sanitizedQuery = sanitizeHTML(searchQuery);
+    const message = searchQuery
+        ? `No recipes found matching "${sanitizedQuery}".`
+        : 'No recipes found matching your search.';
+    displayArea.innerHTML = `<div class="no-results">${message}</div>`;
 }
 
 /**
@@ -343,13 +348,13 @@ function displayRecipeGrid(recipe, index) {
     recipeDiv.classList.add('recipe-card');
 
     let nameHeading = document.createElement('h3');
-    nameHeading.textContent = recipe.name;
+    nameHeading.textContent = sanitizeHTML(recipe.name);
     recipeDiv.appendChild(nameHeading);
 
     if (recipe.imageUrl && recipe.imageUrl.trim() !== '') {
         let recipeImg = document.createElement('img');
         recipeImg.src = recipe.imageUrl;
-        recipeImg.alt = recipe.name;
+        recipeImg.alt = sanitizeHTML(recipe.name);
         recipeDiv.appendChild(recipeImg);
     } else {
         let placeholder = createImagePlaceholder();
@@ -393,7 +398,7 @@ function displayRecipeCompact(recipe, index) {
     if (recipe.imageUrl && recipe.imageUrl.trim() !== '') {
         let recipeImg = document.createElement('img');
         recipeImg.src = recipe.imageUrl;
-        recipeImg.alt = recipe.name;
+        recipeImg.alt = sanitizeHTML(recipe.name);
         cardPreview.appendChild(recipeImg);
     } else {
         let placeholder = createImagePlaceholder();
@@ -401,7 +406,7 @@ function displayRecipeCompact(recipe, index) {
     }
 
     let nameHeading = document.createElement('h3');
-    nameHeading.textContent = recipe.name;
+    nameHeading.textContent = sanitizeHTML(recipe.name);
     cardPreview.appendChild(nameHeading);
 
     // Recipe details (collapsible)
@@ -450,7 +455,7 @@ function displayRecipeList(recipe, index) {
     recipeHeader.classList.add('recipe-header');
 
     let nameHeading = document.createElement('h3');
-    nameHeading.textContent = recipe.name;
+    nameHeading.textContent = sanitizeHTML(recipe.name);
 
     let expandIcon = document.createElement('span');
     expandIcon.classList.add('recipe-expand-icon');
@@ -466,7 +471,7 @@ function displayRecipeList(recipe, index) {
     if (recipe.imageUrl && recipe.imageUrl.trim() !== '') {
         let recipeImg = document.createElement('img');
         recipeImg.src = recipe.imageUrl;
-        recipeImg.alt = recipe.name;
+        recipeImg.alt = sanitizeHTML(recipe.name);
         recipeContent.appendChild(recipeImg);
     } else {
         let placeholder = createImagePlaceholder();
@@ -605,7 +610,7 @@ function createTagBadges(tags) {
             tagBadge.classList.add('tag-default');
         }
         
-        tagBadge.textContent = tag;
+        tagBadge.textContent = sanitizeHTML(tag);
         tagsContainer.appendChild(tagBadge);
     });
     
@@ -636,7 +641,7 @@ async function openCommentsModal(recipeId, recipeName) {
     modalHeader.classList.add('comments-modal-header');
     
     let title = document.createElement('h3');
-    title.textContent = `Comments - ${recipeName}`;
+    title.textContent = `Comments - ${sanitizeHTML(recipeName)}`;
     
     let closeBtn = document.createElement('button');
     closeBtn.classList.add('close-modal');
@@ -721,7 +726,7 @@ async function loadCommentsInModal(recipeId, commentsList) {
 
             let authorDiv = document.createElement('div');
             authorDiv.classList.add('comment-author');
-            authorDiv.textContent = comment.author;
+            authorDiv.textContent = sanitizeHTML(comment.author);
 
             let deleteBtn = document.createElement('button');
             deleteBtn.classList.add('comment-delete-icon');
@@ -736,7 +741,7 @@ async function loadCommentsInModal(recipeId, commentsList) {
 
             let textDiv = document.createElement('div');
             textDiv.classList.add('comment-text');
-            textDiv.textContent = comment.text;
+            textDiv.textContent = sanitizeHTML(comment.text);
 
             commentItem.appendChild(commentHeader);
             commentItem.appendChild(textDiv);
@@ -886,7 +891,7 @@ async function refreshDisplay() {
     if (recipes.length === 0) {
         const searchQuery = searchInput ? searchInput.value : '';
         if (searchQuery) {
-            showNoResults();
+            showNoResults(searchQuery);
         } else {
             displayArea.innerHTML = '<div class="no-results">No recipes yet. Add your first recipe!</div>';
         }
