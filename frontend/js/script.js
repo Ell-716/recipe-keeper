@@ -290,16 +290,9 @@ function exportRecipeToPDF(recipe) {
         const img = new Image();
         img.crossOrigin = 'anonymous';
         img.onload = function() {
-            // Calculate image dimensions (max width 170mm, maintain aspect ratio)
-            const maxWidth = 170;
-            const maxHeight = 80;
-            let imgWidth = maxWidth;
-            let imgHeight = (img.height / img.width) * imgWidth;
-
-            if (imgHeight > maxHeight) {
-                imgHeight = maxHeight;
-                imgWidth = (img.width / img.height) * imgHeight;
-            }
+            // Fixed image dimensions for consistent sizing
+            const imgWidth = 120;
+            const imgHeight = 80;
 
             // Center the image
             const imgX = (pageWidth - imgWidth) / 2;
