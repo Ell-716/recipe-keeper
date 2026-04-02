@@ -23,9 +23,12 @@ backend/comments.json
 
 # Logs
 *.log
+logs/
+backend/logs/
 
 # Environment variables
 .env
+backend/.env
 
 # Claude Code
 CLAUDE.md

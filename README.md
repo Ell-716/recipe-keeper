@@ -29,12 +29,36 @@ A full-stack web application for storing and managing your favorite recipes with
 - **Icon-based Actions**: Intuitive edit, delete, comment, and print icons
 - **Recipe Display**: Beautiful recipe cards with images, formatted ingredients, and step-by-step instructions
 
+## Security Features 🔒
+
+### XSS Protection
+- **HTML Sanitization**: All user-generated content (recipe names, comments, tags) is sanitized before rendering
+- **Character Escaping**: Dangerous characters (`<`, `>`, `&`, `"`, `'`) are escaped to prevent script injection
+
+### Rate Limiting
+- **API Protection**: All endpoints are rate-limited to prevent abuse
+- **Limits by Endpoint**:
+  - GET requests: 100 requests/minute
+  - POST/PUT requests: 20 requests/minute
+  - DELETE requests: 10 requests/minute
+
+### CORS Configuration
+- **Environment-based**: CORS origins configurable via environment variables
+- **Production-ready**: Easily restrict to specific domains in production
+
+### Logging
+- **Structured Logging**: All API requests and operations are logged
+- **Debug/Production Modes**: Log level adjusts based on environment
+- **File Output**: Logs written to `backend/logs/recipe_keeper.log`
+
 ## Tech Stack 🛠️
 
 ### Backend
 - **FastAPI**: Modern Python web framework
 - **Uvicorn**: ASGI server
 - **Pydantic**: Data validation
+- **SlowAPI**: Rate limiting
+- **python-dotenv**: Environment configuration
 - **JSON**: File-based storage
 
 ### Frontend
@@ -48,6 +72,10 @@ A full-stack web application for storing and managing your favorite recipes with
 recipe-keeper/
 ├── backend/
 │   ├── api.py              # FastAPI application
+│   ├── .env                # Environment variables (git-ignored)
+│   ├── .env.example        # Environment template
+│   ├── logs/               # Application logs (git-ignored)
+│   │   └── recipe_keeper.log
 │   ├── recipes.json        # Recipe data storage
 │   └── comments.json       # Comments data storage
 ├── frontend/
@@ -58,7 +86,7 @@ recipe-keeper/
 │   │   └── print.css       # Print-specific styles
 │   ├── js/
 │   │   ├── api.js          # API functions
-│   │   ├── validators.js   # Validation & formatting
+│   │   ├── validators.js   # Validation, formatting & XSS sanitization
 │   │   └── script.js       # Main application logic
 │   └── assets/
 │       ├── bin.png         # Delete icon
@@ -92,14 +120,21 @@ recipe-keeper/
    pip install -r requirements.txt
 ```
 
-3. **Start the backend server**
+3. **Configure environment variables**
+```bash
+   cd backend
+   cp .env.example .env
+   # Edit .env if needed (defaults work for development)
+```
+
+4. **Start the backend server**
 ```bash
    cd backend
    python api.py
 ```
    The API will be available at `http://localhost:8000`
 
-4. **Open the frontend**
+5. **Open the frontend**
 
    Option 1: Open directly in browser
 ```bash
@@ -112,6 +147,25 @@ recipe-keeper/
    python -m http.server 5500
 ```
    Then visit `http://localhost:5500`
+
+## Environment Configuration ⚙️
+
+The backend uses environment variables for configuration. Copy `.env.example` to `.env` and customize as needed:
+
+```bash
+# backend/.env
+ALLOWED_ORIGINS=http://localhost:8080,http://localhost:5500,http://127.0.0.1:5500
+ENVIRONMENT=development
+```
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `ALLOWED_ORIGINS` | Comma-separated list of allowed CORS origins | localhost ports |
+| `ENVIRONMENT` | Set to `production` for production settings | `development` |
+
+**Production notes:**
+- Set `ALLOWED_ORIGINS` to your specific domain(s)
+- Set `ENVIRONMENT=production` for INFO-level logging
 
 ## API Documentation 📚
 
