@@ -23,6 +23,8 @@ backend/comments.json
 
 # Logs
 *.log
+logs/
+backend/logs/
 
 # Environment variables
 .env

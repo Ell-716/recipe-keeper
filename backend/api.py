@@ -8,6 +8,7 @@ It uses a JSON file for storage, and FastAPI for the web server.
 import os
 import os.path
 import json
+import logging
 
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -25,6 +26,18 @@ load_dotenv()
 # In production, set ALLOWED_ORIGINS to your specific domain(s) e.g., "https://yourdomain.com"
 ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
 ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:8080,http://localhost:5500,http://127.0.0.1:5500")
+
+# Configure logging
+os.makedirs("backend/logs", exist_ok=True)
+logging.basicConfig(
+    level=logging.INFO if ENVIRONMENT == "production" else logging.DEBUG,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[
+        logging.StreamHandler(),
+        logging.FileHandler("backend/logs/recipe_keeper.log")
+    ]
+)
+logger = logging.getLogger(__name__)
 
 # Convert comma-separated origins string to list
 allowed_origins_list = [origin.strip() for origin in ALLOWED_ORIGINS.split(",")]
@@ -56,6 +69,7 @@ def load_recipes():
     Returns:
         list: A list of recipes.
     """
+    logger.debug(f"Reading from {RECIPES_FILE}")
     if not os.path.exists(RECIPES_FILE):
         save_recipes([])
 
@@ -70,6 +84,7 @@ def save_recipes(recipes):
     Args:
         recipes (list): List of recipes to save.
     """
+    logger.debug(f"Writing to {RECIPES_FILE}")
     with open(RECIPES_FILE, "w") as file:
         json.dump(recipes, file)
 
@@ -83,6 +98,7 @@ def load_comments():
     Returns:
         list: A list of comments.
     """
+    logger.debug(f"Reading from {COMMENTS_FILE}")
     if not os.path.exists(COMMENTS_FILE):
         save_comments([])
 
@@ -97,6 +113,7 @@ def save_comments(comments):
     Args:
         comments (list): List of comments to save.
     """
+    logger.debug(f"Writing to {COMMENTS_FILE}")
     with open(COMMENTS_FILE, "w") as file:
         json.dump(comments, file)
 
@@ -135,6 +152,12 @@ class Comment(BaseModel):
     text: str
 
 
+@app.on_event("startup")
+async def startup_event():
+    """Log application startup."""
+    logger.info(f"Recipe Keeper API started in {ENVIRONMENT} mode")
+
+
 @app.get("/recipes")
 @limiter.limit("100/minute")
 def read_recipes(request: Request, search: str = Query(None, description="Search query for filtering recipes")):
@@ -147,9 +170,10 @@ def read_recipes(request: Request, search: str = Query(None, description="Search
     Returns:
         list: List of recipes matching the search criteria with comment counts.
     """
+    logger.info(f"GET /recipes - search: {search}")
     recipes = load_recipes()
     comments = load_comments()
-    
+
     # If no search query, return all recipes
     if not search:
         filtered_recipes = recipes
@@ -162,12 +186,13 @@ def read_recipes(request: Request, search: str = Query(None, description="Search
                 search_lower in recipe["ingredients"].lower() or
                 search_lower in recipe["steps"].lower())
         ]
-    
+
     # Add comment counts to each recipe
     for recipe in filtered_recipes:
         recipe_comments = [c for c in comments if c["recipe_id"] == recipe["id"]]
         recipe["comment_count"] = len(recipe_comments)
-    
+
+    logger.debug(f"Returning {len(filtered_recipes)} recipes")
     return filtered_recipes
 
 
@@ -183,11 +208,13 @@ def create_recipe(request: Request, recipe: Recipe):
     Returns:
         dict: The created recipe.
     """
+    logger.info(f"POST /recipes - name: {recipe.name}")
     recipes = load_recipes()
     recipe_id = max((recipe["id"] for recipe in recipes), default=0) + 1
     recipe.id = recipe_id
     recipes.append(recipe.model_dump())
     save_recipes(recipes)
+    logger.info(f"Recipe {recipe_id} created: {recipe.name}")
     return recipe
 
 
@@ -206,9 +233,11 @@ def read_recipe(request: Request, recipe_id: int):
     Returns:
         dict: The requested recipe.
     """
+    logger.info(f"GET /recipes/{recipe_id}")
     recipes = load_recipes()
     recipe = next((recipe for recipe in recipes if recipe["id"] == recipe_id), None)
     if recipe is None:
+        logger.warning(f"Recipe {recipe_id} not found")
         raise HTTPException(status_code=404, detail="Recipe not found")
     return recipe
 
@@ -229,15 +258,18 @@ def update_recipe(request: Request, recipe_id: int, updated_recipe: Recipe):
     Returns:
         dict: The updated recipe.
     """
+    logger.info(f"PUT /recipes/{recipe_id}")
     recipes = load_recipes()
     recipe_index = next((index for index, r in enumerate(recipes) if r["id"] == recipe_id), None)
 
     if recipe_index is None:
+        logger.warning(f"Recipe {recipe_id} not found for update")
         raise HTTPException(status_code=404, detail="Recipe not found")
 
     updated_recipe.id = recipe_id
     recipes[recipe_index] = updated_recipe.model_dump()
     save_recipes(recipes)
+    logger.info(f"Recipe {recipe_id} updated: {updated_recipe.name}")
     return updated_recipe
 
 
@@ -256,20 +288,23 @@ def delete_recipe(request: Request, recipe_id: int):
     Returns:
         dict: A status message indicating successful deletion.
     """
+    logger.info(f"DELETE /recipes/{recipe_id}")
     recipes = load_recipes()
     recipe_index = next((index for index, r in enumerate(recipes) if r["id"] == recipe_id), None)
 
     if recipe_index is None:
+        logger.warning(f"Recipe {recipe_id} not found for deletion")
         raise HTTPException(status_code=404, detail="Recipe not found")
 
     del recipes[recipe_index]
     save_recipes(recipes)
-    
+
     # Also delete all comments for this recipe
     comments = load_comments()
     comments = [c for c in comments if c["recipe_id"] != recipe_id]
     save_comments(comments)
-    
+
+    logger.info(f"Recipe {recipe_id} deleted with associated comments")
     return {"status": "success", "message": "Recipe deleted successfully"}
 
 
@@ -286,8 +321,10 @@ def get_comments(request: Request, recipe_id: int):
     Returns:
         list: List of comments for the recipe.
     """
+    logger.info(f"GET /recipes/{recipe_id}/comments")
     comments = load_comments()
     recipe_comments = [c for c in comments if c["recipe_id"] == recipe_id]
+    logger.debug(f"Returning {len(recipe_comments)} comments for recipe {recipe_id}")
     return recipe_comments
 
 
@@ -304,18 +341,21 @@ def add_comment(request: Request, recipe_id: int, comment: Comment):
     Returns:
         dict: The created comment.
     """
+    logger.info(f"POST /recipes/{recipe_id}/comments - author: {comment.author}")
     # Verify recipe exists
     recipes = load_recipes()
     recipe = next((r for r in recipes if r["id"] == recipe_id), None)
     if recipe is None:
+        logger.warning(f"Recipe {recipe_id} not found for adding comment")
         raise HTTPException(status_code=404, detail="Recipe not found")
-    
+
     comments = load_comments()
     comment_id = max((c["id"] for c in comments), default=0) + 1
     comment.id = comment_id
     comment.recipe_id = recipe_id
     comments.append(comment.model_dump())
     save_comments(comments)
+    logger.info(f"Comment {comment_id} created for recipe {recipe_id}")
     return comment
 
 
@@ -334,14 +374,17 @@ def delete_comment(request: Request, comment_id: int):
     Returns:
         dict: A status message indicating successful deletion.
     """
+    logger.info(f"DELETE /comments/{comment_id}")
     comments = load_comments()
     comment_index = next((index for index, c in enumerate(comments) if c["id"] == comment_id), None)
 
     if comment_index is None:
+        logger.warning(f"Comment {comment_id} not found for deletion")
         raise HTTPException(status_code=404, detail="Comment not found")
 
     del comments[comment_index]
     save_comments(comments)
+    logger.info(f"Comment {comment_id} deleted")
     return {"status": "success", "message": "Comment deleted successfully"}
 
 
