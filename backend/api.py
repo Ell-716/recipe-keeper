@@ -5,6 +5,7 @@ This module provides endpoints for CRUD operations on recipes and comments.
 It uses a JSON file for storage, and FastAPI for the web server.
 """
 
+import os
 import os.path
 import json
 
@@ -15,16 +16,28 @@ import uvicorn
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Environment configuration
+# In production, set ALLOWED_ORIGINS to your specific domain(s) e.g., "https://yourdomain.com"
+ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:8080,http://localhost:5500,http://127.0.0.1:5500")
+
+# Convert comma-separated origins string to list
+allowed_origins_list = [origin.strip() for origin in ALLOWED_ORIGINS.split(",")]
 
 limiter = Limiter(key_func=get_remote_address)
 app = FastAPI()
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
-# CORS settings
+# CORS settings - uses environment variable for allowed origins
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins_list,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

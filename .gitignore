@@ -26,6 +26,7 @@ backend/comments.json
 
 # Environment variables
 .env
+backend/.env
 
 # Claude Code
 CLAUDE.md
