@@ -9,6 +9,7 @@ import os
 import os.path
 import json
 import logging
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -43,7 +44,19 @@ logger = logging.getLogger(__name__)
 allowed_origins_list = [origin.strip() for origin in ALLOWED_ORIGINS.split(",")]
 
 limiter = Limiter(key_func=get_remote_address)
-app = FastAPI()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Lifespan event handler for startup and shutdown."""
+    # Startup
+    logger.info(f"Recipe Keeper API started in {ENVIRONMENT} mode")
+    yield
+    # Shutdown
+    logger.info("Recipe Keeper API shutting down")
+
+
+app = FastAPI(lifespan=lifespan)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
@@ -150,12 +163,6 @@ class Comment(BaseModel):
     recipe_id: int
     author: str
     text: str
-
-
-@app.on_event("startup")
-async def startup_event():
-    """Log application startup."""
-    logger.info(f"Recipe Keeper API started in {ENVIRONMENT} mode")
 
 
 @app.get("/recipes")
