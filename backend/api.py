@@ -160,7 +160,7 @@ async def startup_event():
 
 @app.get("/recipes")
 @limiter.limit("100/minute")
-def read_recipes(request: Request, search: str = Query(None, description="Search query for filtering recipes")):
+async def read_recipes(request: Request, search: str = Query(None, description="Search query for filtering recipes")):
     """Retrieve all recipes, optionally filtered by search query.
 
     Args:
@@ -198,7 +198,7 @@ def read_recipes(request: Request, search: str = Query(None, description="Search
 
 @app.post("/recipes")
 @limiter.limit("20/minute")
-def create_recipe(request: Request, recipe: Recipe):
+async def create_recipe(request: Request, recipe: Recipe):
     """Create a new recipe.
 
     Args:
@@ -220,7 +220,7 @@ def create_recipe(request: Request, recipe: Recipe):
 
 @app.get("/recipes/{recipe_id}")
 @limiter.limit("100/minute")
-def read_recipe(request: Request, recipe_id: int):
+async def read_recipe(request: Request, recipe_id: int):
     """Retrieve a single recipe by its ID.
 
     Args:
@@ -244,7 +244,7 @@ def read_recipe(request: Request, recipe_id: int):
 
 @app.put("/recipes/{recipe_id}")
 @limiter.limit("20/minute")
-def update_recipe(request: Request, recipe_id: int, updated_recipe: Recipe):
+async def update_recipe(request: Request, recipe_id: int, updated_recipe: Recipe):
     """Update a recipe by its ID.
 
     Args:
@@ -275,7 +275,7 @@ def update_recipe(request: Request, recipe_id: int, updated_recipe: Recipe):
 
 @app.delete("/recipes/{recipe_id}")
 @limiter.limit("10/minute")
-def delete_recipe(request: Request, recipe_id: int):
+async def delete_recipe(request: Request, recipe_id: int):
     """Delete a recipe by its ID.
 
     Args:
@@ -311,7 +311,7 @@ def delete_recipe(request: Request, recipe_id: int):
 # Comment endpoints
 @app.get("/recipes/{recipe_id}/comments")
 @limiter.limit("100/minute")
-def get_comments(request: Request, recipe_id: int):
+async def get_comments(request: Request, recipe_id: int):
     """Get all comments for a specific recipe.
 
     Args:
@@ -330,7 +330,7 @@ def get_comments(request: Request, recipe_id: int):
 
 @app.post("/recipes/{recipe_id}/comments")
 @limiter.limit("20/minute")
-def add_comment(request: Request, recipe_id: int, comment: Comment):
+async def add_comment(request: Request, recipe_id: int, comment: Comment):
     """Add a comment to a recipe.
 
     Args:
@@ -361,7 +361,7 @@ def add_comment(request: Request, recipe_id: int, comment: Comment):
 
 @app.delete("/comments/{comment_id}")
 @limiter.limit("10/minute")
-def delete_comment(request: Request, comment_id: int):
+async def delete_comment(request: Request, comment_id: int):
     """Delete a comment by its ID.
 
     Args:
