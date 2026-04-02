@@ -8,12 +8,18 @@ It uses a JSON file for storage, and FastAPI for the web server.
 import os.path
 import json
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import uvicorn
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
+limiter = Limiter(key_func=get_remote_address)
 app = FastAPI()
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # CORS settings
 app.add_middleware(
@@ -117,12 +123,14 @@ class Comment(BaseModel):
 
 
 @app.get("/recipes")
-def read_recipes(search: str = Query(None, description="Search query for filtering recipes")):
+@limiter.limit("100/minute")
+def read_recipes(request: Request, search: str = Query(None, description="Search query for filtering recipes")):
     """Retrieve all recipes, optionally filtered by search query.
-    
+
     Args:
+        request (Request): The incoming request object (used for rate limiting).
         search (str, optional): Search query to filter recipes by name, ingredients, or steps.
-    
+
     Returns:
         list: List of recipes matching the search criteria with comment counts.
     """
@@ -151,10 +159,12 @@ def read_recipes(search: str = Query(None, description="Search query for filteri
 
 
 @app.post("/recipes")
-def create_recipe(recipe: Recipe):
+@limiter.limit("20/minute")
+def create_recipe(request: Request, recipe: Recipe):
     """Create a new recipe.
 
     Args:
+        request (Request): The incoming request object (used for rate limiting).
         recipe (Recipe): The recipe details to create.
 
     Returns:
@@ -169,10 +179,12 @@ def create_recipe(recipe: Recipe):
 
 
 @app.get("/recipes/{recipe_id}")
-def read_recipe(recipe_id: int):
+@limiter.limit("100/minute")
+def read_recipe(request: Request, recipe_id: int):
     """Retrieve a single recipe by its ID.
 
     Args:
+        request (Request): The incoming request object (used for rate limiting).
         recipe_id (int): ID of the recipe to retrieve.
 
     Raises:
@@ -189,10 +201,12 @@ def read_recipe(recipe_id: int):
 
 
 @app.put("/recipes/{recipe_id}")
-def update_recipe(recipe_id: int, updated_recipe: Recipe):
+@limiter.limit("20/minute")
+def update_recipe(request: Request, recipe_id: int, updated_recipe: Recipe):
     """Update a recipe by its ID.
 
     Args:
+        request (Request): The incoming request object (used for rate limiting).
         recipe_id (int): ID of the recipe to update.
         updated_recipe (Recipe): New details for the recipe.
 
@@ -215,10 +229,12 @@ def update_recipe(recipe_id: int, updated_recipe: Recipe):
 
 
 @app.delete("/recipes/{recipe_id}")
-def delete_recipe(recipe_id: int):
+@limiter.limit("10/minute")
+def delete_recipe(request: Request, recipe_id: int):
     """Delete a recipe by its ID.
 
     Args:
+        request (Request): The incoming request object (used for rate limiting).
         recipe_id (int): ID of the recipe to delete.
 
     Raises:
@@ -246,10 +262,12 @@ def delete_recipe(recipe_id: int):
 
 # Comment endpoints
 @app.get("/recipes/{recipe_id}/comments")
-def get_comments(recipe_id: int):
+@limiter.limit("100/minute")
+def get_comments(request: Request, recipe_id: int):
     """Get all comments for a specific recipe.
 
     Args:
+        request (Request): The incoming request object (used for rate limiting).
         recipe_id (int): ID of the recipe.
 
     Returns:
@@ -261,10 +279,12 @@ def get_comments(recipe_id: int):
 
 
 @app.post("/recipes/{recipe_id}/comments")
-def add_comment(recipe_id: int, comment: Comment):
+@limiter.limit("20/minute")
+def add_comment(request: Request, recipe_id: int, comment: Comment):
     """Add a comment to a recipe.
 
     Args:
+        request (Request): The incoming request object (used for rate limiting).
         recipe_id (int): ID of the recipe.
         comment (Comment): Comment data.
 
@@ -287,10 +307,12 @@ def add_comment(recipe_id: int, comment: Comment):
 
 
 @app.delete("/comments/{comment_id}")
-def delete_comment(comment_id: int):
+@limiter.limit("10/minute")
+def delete_comment(request: Request, comment_id: int):
     """Delete a comment by its ID.
 
     Args:
+        request (Request): The incoming request object (used for rate limiting).
         comment_id (int): ID of the comment to delete.
 
     Raises:
