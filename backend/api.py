@@ -13,7 +13,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 import uvicorn
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
@@ -143,9 +143,9 @@ class Recipe(BaseModel):
         tags (list): List of tags/categories for the recipe.
     """
     id: int = None
-    name: str
-    ingredients: str
-    steps: str
+    name: str = Field(..., min_length=1)
+    ingredients: str = Field(..., min_length=1)
+    steps: str = Field(..., min_length=1)
     imageUrl: str = ""
     tags: list = []
 
@@ -161,8 +161,8 @@ class Comment(BaseModel):
     """
     id: int = None
     recipe_id: int
-    author: str
-    text: str
+    author: str = Field(..., min_length=1)
+    text: str = Field(..., min_length=1)
 
 
 @app.get("/recipes")
