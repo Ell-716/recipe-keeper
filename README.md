@@ -16,17 +16,22 @@ A full-stack web application for storing and managing your favorite recipes with
 - **Search Functionality**: Real-time search across recipe names, ingredients, and steps
 - **Advanced Sorting**: Sort recipes by name (A-Z, Z-A), date added (newest/oldest), or number of comments
 - **Comment System**: Add and delete comments on recipes with a modal interface
-- **Print Recipe**: Print any recipe or save as PDF with a clean, printer-friendly layout
+- **Download Recipe as PDF**: Export any recipe to a PDF file with one click
+  - Click the download icon on any recipe card
+  - Automatically generates a formatted PDF using jsPDF
+  - Includes recipe name, image (if available), ingredients, and steps
+  - PDF file named after the recipe (e.g., "chocolate-cake.pdf")
+- **Print Recipe**: Print any recipe with a clean, printer-friendly layout
   - Click the print icon on any recipe card
-  - Optimized A4 page formatting
+  - Opens optimized print preview
   - Includes recipe name, image, ingredients list, and steps
-  - Works with "Save as PDF" or direct printing
+  - Works with browser print or "Save as PDF"
 - **Image Placeholder**: Recipes without images display a styled placeholder
   - Light gray background with fork and knife icon
   - "No image available" text
   - Consistent sizing across all view modes
 - **Responsive Design**: Clean, professional UI with background imagery
-- **Icon-based Actions**: Intuitive edit, delete, comment, and print icons
+- **Icon-based Actions**: Intuitive edit, delete, comment, download, and print icons
 - **Recipe Display**: Beautiful recipe cards with images, formatted ingredients, and step-by-step instructions
 
 ## Security Features 🔒
@@ -61,21 +66,33 @@ A full-stack web application for storing and managing your favorite recipes with
 - **python-dotenv**: Environment configuration
 - **JSON**: File-based storage
 
+### Testing
+- **pytest**: Testing framework
+- **pytest-asyncio**: Async test support
+- **pytest-cov**: Code coverage reporting
+- **httpx**: HTTP client for testing FastAPI endpoints
+
 ### Frontend
 - **HTML5**: Structure
 - **CSS3**: Styling with custom design
 - **Vanilla JavaScript**: Dynamic functionality
 - **Fetch API**: HTTP requests
+- **jsPDF**: PDF generation for recipe downloads
 
 ## Project Structure 📁
 ```
 recipe-keeper/
 ├── backend/
 │   ├── api.py              # FastAPI application
+│   ├── pytest.ini          # Pytest configuration
 │   ├── .env                # Environment variables (git-ignored)
 │   ├── .env.example        # Environment template
 │   ├── logs/               # Application logs (git-ignored)
 │   │   └── recipe_keeper.log
+│   ├── tests/              # Test suite
+│   │   ├── conftest.py     # Test fixtures and configuration
+│   │   ├── test_recipes.py # Recipe endpoint tests
+│   │   └── test_comments.py# Comment endpoint tests
 │   ├── recipes.json        # Recipe data storage
 │   └── comments.json       # Comments data storage
 ├── frontend/
@@ -92,6 +109,7 @@ recipe-keeper/
 │       ├── bin.png         # Delete icon
 │       ├── edit-text.png   # Edit icon
 │       ├── chat.png        # Comment icon
+│       ├── download.png    # Download PDF icon
 │       ├── print.png       # Print icon
 │       ├── search.png      # Search icon
 │       ├── filter.png      # Sort/filter icon
@@ -147,6 +165,57 @@ recipe-keeper/
    python -m http.server 5500
 ```
    Then visit `http://localhost:5500`
+
+## Testing 🧪
+
+The backend API has comprehensive test coverage to ensure reliability and catch regressions.
+
+### Test Coverage
+
+- **94% code coverage** across all backend API endpoints
+- **20 passing tests** covering CRUD operations, validation, and edge cases
+
+### Running Tests
+
+```bash
+cd backend
+
+# Run all tests
+pytest -v
+
+# Run specific test file
+pytest tests/test_recipes.py -v
+pytest tests/test_comments.py -v
+
+# Run with coverage report
+pytest --cov=api --cov-report=term-missing
+
+# Generate HTML coverage report
+pytest --cov=api --cov-report=html
+# Open htmlcov/index.html in browser
+```
+
+### What's Tested
+
+**Recipe Endpoints (12 tests):**
+- ✅ GET /recipes - Retrieve all recipes
+- ✅ POST /recipes - Create new recipe with validation
+- ✅ GET /recipes/{id} - Get single recipe
+- ✅ PUT /recipes/{id} - Update recipe
+- ✅ DELETE /recipes/{id} - Delete recipe
+- ✅ GET /recipes?search=query - Search functionality
+- ✅ Comment count aggregation
+- ✅ Cascade deletion of comments
+- ✅ 404 error handling
+- ✅ Input validation (empty fields rejected)
+
+**Comment Endpoints (8 tests):**
+- ✅ POST /recipes/{id}/comments - Add comment
+- ✅ GET /recipes/{id}/comments - Get all comments
+- ✅ DELETE /comments/{id} - Delete comment
+- ✅ Multiple comments per recipe
+- ✅ 404 error handling
+- ✅ Input validation (empty fields rejected)
 
 ## Environment Configuration ⚙️
 
