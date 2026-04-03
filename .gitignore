@@ -9,9 +9,10 @@ venv/
 ENV/
 *.egg-info/
 
-# Data files (optional - comment out if you want to track them)
-backend/recipes.json
-backend/comments.json
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
 
 # IDE/Editor files
 .vscode/
