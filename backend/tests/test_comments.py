@@ -118,4 +118,4 @@ def test_comment_validation(client, sample_recipe):
         "recipe_id": recipe_id
     }
     response = client.post(f"/recipes/{recipe_id}/comments", json=invalid_comment)
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.status_code == 422

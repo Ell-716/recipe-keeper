@@ -101,7 +101,7 @@ def test_create_recipe_validation(client):
         "steps": ""
     }
     response = client.post("/recipes", json=invalid_recipe)
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.status_code == 422
 
 def test_recipe_comment_count(client, sample_recipe, sample_comment):
     """Test that recipes include comment counts"""
