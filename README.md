@@ -16,17 +16,22 @@ A full-stack web application for storing and managing your favorite recipes with
 - **Search Functionality**: Real-time search across recipe names, ingredients, and steps
 - **Advanced Sorting**: Sort recipes by name (A-Z, Z-A), date added (newest/oldest), or number of comments
 - **Comment System**: Add and delete comments on recipes with a modal interface
-- **Print Recipe**: Print any recipe or save as PDF with a clean, printer-friendly layout
+- **Download Recipe as PDF**: Export any recipe to a PDF file with one click
+  - Click the download icon on any recipe card
+  - Automatically generates a formatted PDF using jsPDF
+  - Includes recipe name, image (if available), ingredients, and steps
+  - PDF file named after the recipe (e.g., "chocolate-cake.pdf")
+- **Print Recipe**: Print any recipe with a clean, printer-friendly layout
   - Click the print icon on any recipe card
-  - Optimized A4 page formatting
+  - Opens optimized print preview
   - Includes recipe name, image, ingredients list, and steps
-  - Works with "Save as PDF" or direct printing
+  - Works with browser print or "Save as PDF"
 - **Image Placeholder**: Recipes without images display a styled placeholder
   - Light gray background with fork and knife icon
   - "No image available" text
   - Consistent sizing across all view modes
 - **Responsive Design**: Clean, professional UI with background imagery
-- **Icon-based Actions**: Intuitive edit, delete, comment, and print icons
+- **Icon-based Actions**: Intuitive edit, delete, comment, download, and print icons
 - **Recipe Display**: Beautiful recipe cards with images, formatted ingredients, and step-by-step instructions
 
 ## Security Features 🔒
@@ -72,6 +77,7 @@ A full-stack web application for storing and managing your favorite recipes with
 - **CSS3**: Styling with custom design
 - **Vanilla JavaScript**: Dynamic functionality
 - **Fetch API**: HTTP requests
+- **jsPDF**: PDF generation for recipe downloads
 
 ## Project Structure 📁
 ```
@@ -103,6 +109,7 @@ recipe-keeper/
 │       ├── bin.png         # Delete icon
 │       ├── edit-text.png   # Edit icon
 │       ├── chat.png        # Comment icon
+│       ├── download.png    # Download PDF icon
 │       ├── print.png       # Print icon
 │       ├── search.png      # Search icon
 │       ├── filter.png      # Sort/filter icon
