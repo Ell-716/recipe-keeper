@@ -1,0 +1,18 @@
+{
+  "name": "recipe-keeper-frontend",
+  "version": "1.0.0",
+  "description": "Frontend tests for Recipe Keeper",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "keywords": ["recipe", "testing"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@jest/globals": "^30.3.0",
+    "jest": "^30.3.0",
+    "jest-environment-jsdom": "^30.3.0"
+  }
+}

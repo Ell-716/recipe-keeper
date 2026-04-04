@@ -67,10 +67,12 @@ A full-stack web application for storing and managing your favorite recipes with
 - **JSON**: File-based storage
 
 ### Testing
-- **pytest**: Testing framework
+- **pytest**: Backend testing framework
 - **pytest-asyncio**: Async test support
 - **pytest-cov**: Code coverage reporting
 - **httpx**: HTTP client for testing FastAPI endpoints
+- **Jest**: Frontend testing framework
+- **jsdom**: DOM simulation for testing
 
 ### Frontend
 - **HTML5**: Structure
@@ -98,6 +100,9 @@ recipe-keeper/
 ├── frontend/
 │   ├── index.html          # Main HTML file
 │   ├── print-recipe.html   # Print-friendly recipe page
+│   ├── package.json        # npm configuration
+│   ├── jest.config.js      # Jest test configuration
+│   ├── .gitignore          # Git ignore rules
 │   ├── css/
 │   │   ├── styles.css      # Main styles
 │   │   └── print.css       # Print-specific styles
@@ -105,6 +110,9 @@ recipe-keeper/
 │   │   ├── api.js          # API functions
 │   │   ├── validators.js   # Validation, formatting & XSS sanitization
 │   │   └── script.js       # Main application logic
+│   ├── tests/              # Frontend test suite
+│   │   ├── validators.test.js # Sanitization tests
+│   │   └── api.test.js     # API configuration tests
 │   └── assets/
 │       ├── bin.png         # Delete icon
 │       ├── edit-text.png   # Edit icon
@@ -124,6 +132,7 @@ recipe-keeper/
 ### Prerequisites
 - Python 3.8+
 - pip
+- Node.js and npm (optional, for frontend testing)
 
 ### Setup
 
@@ -152,7 +161,13 @@ recipe-keeper/
 ```
    The API will be available at `http://localhost:8000`
 
-5. **Open the frontend**
+5. **Install frontend dependencies** (optional, for testing)
+```bash
+   cd frontend
+   npm install
+```
+
+6. **Open the frontend**
 
    Option 1: Open directly in browser
 ```bash
@@ -168,14 +183,16 @@ recipe-keeper/
 
 ## Testing 🧪
 
-The backend API has comprehensive test coverage to ensure reliability and catch regressions.
+Both backend and frontend have comprehensive test coverage to ensure reliability and catch regressions.
 
-### Test Coverage
+### Backend Testing
+
+#### Test Coverage
 
 - **94% code coverage** across all backend API endpoints
 - **20 passing tests** covering CRUD operations, validation, and edge cases
 
-### Running Tests
+#### Running Backend Tests
 
 ```bash
 cd backend
@@ -195,7 +212,7 @@ pytest --cov=api --cov-report=html
 # Open htmlcov/index.html in browser
 ```
 
-### What's Tested
+### What's Tested (Backend)
 
 **Recipe Endpoints (12 tests):**
 - ✅ GET /recipes - Retrieve all recipes
@@ -216,6 +233,57 @@ pytest --cov=api --cov-report=html
 - ✅ Multiple comments per recipe
 - ✅ 404 error handling
 - ✅ Input validation (empty fields rejected)
+
+### Frontend Testing
+
+The frontend uses Jest for testing critical functionality including XSS protection and API configuration.
+
+#### Test Coverage
+
+- **39 passing tests** covering sanitization and API validation
+- **16 sanitization tests** ensuring XSS protection
+- **23 API tests** validating endpoint construction and configuration
+
+#### Running Frontend Tests
+
+```bash
+cd frontend
+
+# Install dependencies (first time only)
+npm install
+
+# Run all tests
+npm test
+
+# Run tests in watch mode (auto-rerun on file changes)
+npm run test:watch
+
+# Run with coverage report
+npm run test:coverage
+
+# View HTML coverage report
+open coverage/index.html  # macOS
+xdg-open coverage/index.html  # Linux
+start coverage/index.html  # Windows
+```
+
+#### What's Tested (Frontend)
+
+**Input Sanitization (16 tests):**
+- ✅ Escape script tags to prevent XSS
+- ✅ Escape img tags with onerror handlers
+- ✅ Escape HTML special characters (`<`, `>`, `&`, `"`, `'`)
+- ✅ Handle empty strings, null, and undefined inputs
+- ✅ Process very long strings
+- ✅ Sanitize recipe names and comments with special characters
+
+**API Configuration (23 tests):**
+- ✅ API base URL validation
+- ✅ Endpoint construction (recipes, comments, search)
+- ✅ HTTP method validation (GET, POST, PUT, DELETE)
+- ✅ Request headers validation
+- ✅ Error status code handling (404, 500, 422, 429)
+- ✅ JSON parsing and response handling
 
 ## Environment Configuration ⚙️
 
