@@ -28,14 +28,21 @@ load_dotenv()
 ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
 ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:8080,http://localhost:5500,http://127.0.0.1:5500")
 
-# Configure logging
-os.makedirs("backend/logs", exist_ok=True)
+# Directory configuration
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# DATA_DIR can be overridden for production (e.g., /app/data on Fly.io for persistent storage)
+DATA_DIR = os.getenv("DATA_DIR", BASE_DIR)
+LOG_DIR = os.path.join(BASE_DIR, "logs")
+
+# Create necessary directories
+os.makedirs(DATA_DIR, exist_ok=True)
+os.makedirs(LOG_DIR, exist_ok=True)
 logging.basicConfig(
     level=logging.INFO if ENVIRONMENT == "production" else logging.DEBUG,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     handlers=[
         logging.StreamHandler(),
-        logging.FileHandler("backend/logs/recipe_keeper.log")
+        logging.FileHandler(os.path.join(LOG_DIR, "recipe_keeper.log"))
     ]
 )
 logger = logging.getLogger(__name__)
@@ -69,8 +76,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-RECIPES_FILE = "recipes.json"
-COMMENTS_FILE = "comments.json"
+# Data files - stored in DATA_DIR for persistent storage
+RECIPES_FILE = os.path.join(DATA_DIR, "recipes.json")
+COMMENTS_FILE = os.path.join(DATA_DIR, "comments.json")
 
 
 def load_recipes():
@@ -396,5 +404,16 @@ async def delete_comment(request: Request, comment_id: int):
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    port = int(os.getenv("PORT", 8000))
+    host = os.getenv("HOST", "0.0.0.0")
+
+    logger.info(f"Starting Recipe Keeper API on {host}:{port}")
+    logger.info(f"Environment: {ENVIRONMENT}")
+
+    uvicorn.run(
+        app,
+        host=host,
+        port=port,
+        log_level="info"
+    )
     
