@@ -2,6 +2,12 @@
 
 A full-stack web application for storing and managing your favorite recipes with search, sorting, and commenting features.
 
+## 🌐 Live Demo
+
+- **Frontend**: https://recipe-keeper-xxx.vercel.app _(Update after deployment)_
+- **API**: https://your-app-name.fly.dev _(Update after deployment)_
+- **API Docs**: https://your-app-name.fly.dev/docs
+
 ## Features ✨
 
 - **CRUD Operations**: Create, Read, Update, and Delete recipes
