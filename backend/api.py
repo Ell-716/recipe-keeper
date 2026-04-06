@@ -28,9 +28,14 @@ load_dotenv()
 ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
 ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:8080,http://localhost:5500,http://127.0.0.1:5500")
 
-# Configure logging with path relative to this file
+# Directory configuration
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# DATA_DIR can be overridden for production (e.g., /app/data on Fly.io for persistent storage)
+DATA_DIR = os.getenv("DATA_DIR", BASE_DIR)
 LOG_DIR = os.path.join(BASE_DIR, "logs")
+
+# Create necessary directories
+os.makedirs(DATA_DIR, exist_ok=True)
 os.makedirs(LOG_DIR, exist_ok=True)
 logging.basicConfig(
     level=logging.INFO if ENVIRONMENT == "production" else logging.DEBUG,
@@ -71,9 +76,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Data files with paths relative to this file
-RECIPES_FILE = os.path.join(BASE_DIR, "recipes.json")
-COMMENTS_FILE = os.path.join(BASE_DIR, "comments.json")
+# Data files - stored in DATA_DIR for persistent storage
+RECIPES_FILE = os.path.join(DATA_DIR, "recipes.json")
+COMMENTS_FILE = os.path.join(DATA_DIR, "comments.json")
 
 
 def load_recipes():
