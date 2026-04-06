@@ -1,0 +1,53 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+venv/
+ENV/
+env/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+*.coverage
+tests/
+pytest.ini
+
+# Environment files (NEVER include secrets in Docker images!)
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs (will be created fresh in container)
+logs/
+*.log
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# Documentation
+README.md
+*.md
+
+# Coverage reports
+.coverage.*
+coverage/
