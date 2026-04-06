@@ -1,5 +1,21 @@
 // API Configuration
-const API_URL = 'http://localhost:8000';
+// Automatically detects environment and uses appropriate backend URL
+const API_URL = (() => {
+  // Check if running in production (deployed frontend)
+  const isProduction = window.location.hostname !== 'localhost' &&
+                       window.location.hostname !== '127.0.0.1';
+
+  if (isProduction) {
+    // Production: Use Fly.io backend
+    // Can be overridden by setting window.ENV = { API_URL: 'your-url' } before loading this script
+    return window.ENV?.API_URL || 'https://recipe-keeper-backend.fly.dev';
+  }
+
+  // Development: Use local backend
+  return 'http://localhost:8000';
+})();
+
+console.log('Using API URL:', API_URL);
 
 // API Function: Fetch all recipes (with optional search)
 async function fetchRecipes(searchQuery = '') {
