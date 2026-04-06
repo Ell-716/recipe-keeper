@@ -28,14 +28,16 @@ load_dotenv()
 ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
 ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:8080,http://localhost:5500,http://127.0.0.1:5500")
 
-# Configure logging
-os.makedirs("backend/logs", exist_ok=True)
+# Configure logging with path relative to this file
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+LOG_DIR = os.path.join(BASE_DIR, "logs")
+os.makedirs(LOG_DIR, exist_ok=True)
 logging.basicConfig(
     level=logging.INFO if ENVIRONMENT == "production" else logging.DEBUG,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     handlers=[
         logging.StreamHandler(),
-        logging.FileHandler("backend/logs/recipe_keeper.log")
+        logging.FileHandler(os.path.join(LOG_DIR, "recipe_keeper.log"))
     ]
 )
 logger = logging.getLogger(__name__)
@@ -69,8 +71,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-RECIPES_FILE = "recipes.json"
-COMMENTS_FILE = "comments.json"
+# Data files with paths relative to this file
+RECIPES_FILE = os.path.join(BASE_DIR, "recipes.json")
+COMMENTS_FILE = os.path.join(BASE_DIR, "comments.json")
 
 
 def load_recipes():
