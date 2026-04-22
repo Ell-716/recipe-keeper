@@ -89,46 +89,60 @@ A full-stack web application for storing and managing your favorite recipes with
 ## Project Structure 📁
 ```
 recipe-keeper/
+├── .github/
+│   └── workflows/
+│       └── test.yml            # CI: runs backend & frontend tests
 ├── backend/
-│   ├── api.py              # FastAPI application
-│   ├── pytest.ini          # Pytest configuration
-│   ├── .env                # Environment variables (git-ignored)
-│   ├── .env.example        # Environment template
-│   ├── logs/               # Application logs (git-ignored)
+│   ├── api.py                  # FastAPI application
+│   ├── Dockerfile              # Container image for Fly.io
+│   ├── fly.toml                # Fly.io app configuration
+│   ├── init_data.sh            # Initializes JSON files on volume at startup
+│   ├── requirements.txt        # Python dependencies
+│   ├── pytest.ini              # Pytest configuration
+│   ├── .env                    # Environment variables (git-ignored)
+│   ├── .env.example            # Environment template
+│   ├── .dockerignore           # Docker build exclusions
+│   ├── recipes.json            # Local recipe data storage
+│   ├── comments.json           # Local comments data storage
+│   ├── logs/                   # Application logs (git-ignored)
 │   │   └── recipe_keeper.log
-│   ├── tests/              # Test suite
-│   │   ├── conftest.py     # Test fixtures and configuration
-│   │   ├── test_recipes.py # Recipe endpoint tests
-│   │   └── test_comments.py# Comment endpoint tests
-│   ├── recipes.json        # Recipe data storage
-│   └── comments.json       # Comments data storage
+│   └── tests/                  # Test suite
+│       ├── conftest.py         # Test fixtures and configuration
+│       ├── test_recipes.py     # Recipe endpoint tests
+│       └── test_comments.py    # Comment endpoint tests
 ├── frontend/
-│   ├── index.html          # Main HTML file
-│   ├── print-recipe.html   # Print-friendly recipe page
-│   ├── package.json        # npm configuration
-│   ├── jest.config.js      # Jest test configuration
-│   ├── .gitignore          # Git ignore rules
+│   ├── index.html              # Main HTML file
+│   ├── print-recipe.html       # Print-friendly recipe page
+│   ├── package.json            # npm configuration
+│   ├── package-lock.json
+│   ├── jest.config.js          # Jest test configuration
+│   ├── .gitignore
 │   ├── css/
-│   │   ├── styles.css      # Main styles
-│   │   └── print.css       # Print-specific styles
+│   │   ├── styles.css          # Main styles
+│   │   └── print.css           # Print-specific styles
 │   ├── js/
-│   │   ├── api.js          # API functions
-│   │   ├── validators.js   # Validation, formatting & XSS sanitization
-│   │   └── script.js       # Main application logic
-│   ├── tests/              # Frontend test suite
-│   │   ├── validators.test.js # Sanitization tests
-│   │   └── api.test.js     # API configuration tests
+│   │   ├── api.js              # API communication layer
+│   │   ├── validators.js       # Validation, formatting & XSS sanitization
+│   │   └── script.js           # Main application logic
+│   ├── tests/                  # Frontend test suite
+│   │   ├── validators.test.js  # Sanitization tests
+│   │   └── api.test.js         # API configuration tests
 │   └── assets/
-│       ├── bin.png         # Delete icon
-│       ├── edit-text.png   # Edit icon
-│       ├── chat.png        # Comment icon
-│       ├── download.png    # Download PDF icon
-│       ├── print.png       # Print icon
-│       ├── search.png      # Search icon
-│       ├── filter.png      # Sort/filter icon
-│       └── down.png        # Dropdown arrow icon
+│       ├── bin.png             # Delete icon
+│       ├── edit-text.png       # Edit icon
+│       ├── chat.png            # Comment icon
+│       ├── download.png        # Download PDF icon
+│       ├── print.png           # Print icon
+│       ├── search.png          # Search icon
+│       ├── filter.png          # Sort/filter icon
+│       └── down.png            # Dropdown arrow icon
+├── docker-compose.yml          # Local Docker development setup
+├── fly.toml                    # Root-level Fly.io config (reference)
 ├── .gitignore
-├── requirements.txt
+├── requirements.txt            # Root-level Python dependencies
+├── DEPLOYMENT.md               # Detailed deployment guide
+├── CLAUDE.md                   # Claude Code project instructions
+├── LICENSE
 └── README.md
 ```
 
