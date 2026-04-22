@@ -148,7 +148,7 @@ async function loadRecipes(searchQuery = '') {
         
         refreshDisplay();
     } catch (error) {
-        showError('Failed to load recipes. Please make sure the API server is running at http://localhost:8000');
+        showError(`Failed to load recipes. Please make sure the API server is running at ${API_URL}`);
     }
 }
 
