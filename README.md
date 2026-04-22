@@ -5,8 +5,8 @@ A full-stack web application for storing and managing your favorite recipes with
 ## 🌐 Live Demo
 
 - **Frontend**: https://recipe-keeper-xxx.vercel.app _(Update after deployment)_
-- **API**: https://your-app-name.fly.dev _(Update after deployment)_
-- **API Docs**: https://your-app-name.fly.dev/docs
+- **API**: https://recipe-keeper-backend.fly.dev
+- **API Docs**: https://recipe-keeper-backend.fly.dev/docs
 
 ## Features ✨
 
@@ -309,6 +309,84 @@ ENVIRONMENT=development
 **Production notes:**
 - Set `ALLOWED_ORIGINS` to your specific domain(s)
 - Set `ENVIRONMENT=production` for INFO-level logging
+
+## Deployment 🚀
+
+### Backend — Fly.io
+
+The backend is deployed on [Fly.io](https://fly.io) with a persistent volume for JSON data storage.
+
+#### Prerequisites
+
+```bash
+# Install the Fly CLI
+brew install flyctl   # macOS
+# or: curl -L https://fly.io/install.sh | sh
+
+# Log in
+fly auth login
+```
+
+#### First-time setup
+
+```bash
+cd backend
+
+# Create the app (already configured in fly.toml)
+fly launch --no-deploy
+
+# Create a persistent volume for recipes.json / comments.json
+fly volume create recipe_data -r ams -n 1 --app recipe-keeper-backend
+
+# Deploy
+fly deploy
+```
+
+#### Environment variables
+
+The following are set in `fly.toml` under `[env]` and do not need to be configured manually:
+
+| Variable | Value | Purpose |
+|----------|-------|---------|
+| `ENVIRONMENT` | `production` | Enables production logging |
+| `DATA_DIR` | `/data` | Points the app to the mounted volume |
+
+For secrets (e.g. `ALLOWED_ORIGINS`), use:
+
+```bash
+fly secrets set ALLOWED_ORIGINS=https://your-frontend.vercel.app
+```
+
+#### How data persistence works
+
+- A Fly volume named `recipe_data` is mounted at `/data` inside the container.
+- On each startup, `init_data.sh` creates empty `recipes.json` and `comments.json` if they don't exist.
+- All recipe and comment data survives redeploys because it lives on the volume, not in the container image.
+
+#### Migrating local recipes to production
+
+```bash
+# Post each recipe from your local recipes.json to the live API
+curl -X POST https://recipe-keeper-backend.fly.dev/recipes \
+  -H "Content-Type: application/json" \
+  -d '{"name":"...","ingredients":"...","steps":"...","imageUrl":"...","tags":[...]}'
+```
+
+#### Useful Fly commands
+
+```bash
+# View live logs
+fly logs --app recipe-keeper-backend
+
+# SSH into the running machine
+fly ssh console --app recipe-keeper-backend
+
+# Check volume contents
+fly ssh console --app recipe-keeper-backend -C "cat /data/recipes.json"
+
+# Redeploy after code changes
+cd backend && fly deploy
+```
 
 ## API Documentation 📚
 
