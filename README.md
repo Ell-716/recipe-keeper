@@ -4,7 +4,7 @@ A full-stack web application for storing and managing your favorite recipes with
 
 ## 🌐 Live Demo
 
-- **Frontend**: https://recipe-keeper-xxx.vercel.app _(Update after deployment)_
+- **Frontend**: https://my-recipe-keeper.vercel.app
 - **API**: https://recipe-keeper-backend.fly.dev
 - **API Docs**: https://recipe-keeper-backend.fly.dev/docs
 
@@ -386,6 +386,27 @@ fly ssh console --app recipe-keeper-backend -C "cat /data/recipes.json"
 
 # Redeploy after code changes
 cd backend && fly deploy
+```
+
+### Frontend — Vercel
+
+The frontend is deployed on [Vercel](https://vercel.com) directly from the `frontend/` directory.
+
+#### Setup
+
+1. Import the repository on [vercel.com/new](https://vercel.com/new)
+2. Set the **Root Directory** to `frontend`
+3. Leave framework preset as **Other** (no build step required)
+4. Click **Deploy**
+
+Vercel automatically redeploys on every push to `main`.
+
+#### After deploying
+
+Update the backend CORS secret with your Vercel URL:
+
+```bash
+fly secrets set ALLOWED_ORIGINS=https://my-recipe-keeper.vercel.app,http://localhost:5500,http://127.0.0.1:5500
 ```
 
 ## API Documentation 📚
