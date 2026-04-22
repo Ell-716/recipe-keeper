@@ -21,6 +21,10 @@ COPY api.py .
 COPY recipes.json .
 COPY comments.json .
 
+# Copy init script
+COPY init_data.sh /app/init_data.sh
+RUN chmod +x /app/init_data.sh
+
 # Note: logs directory will be created automatically by api.py
 
 # Expose port
@@ -31,4 +35,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD python -c "import httpx; httpx.get('http://localhost:8000/recipes')"
 
 # Run the application
-CMD uvicorn api:app --host 0.0.0.0 --port ${PORT}
+CMD /app/init_data.sh && uvicorn api:app --host 0.0.0.0 --port ${PORT}
