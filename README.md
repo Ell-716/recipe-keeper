@@ -5,7 +5,6 @@ A full-stack web application for storing and managing your favorite recipes with
 ## 🌐 Live Demo
 
 - **Frontend**: https://my-recipe-keeper.vercel.app
-- **API**: https://recipe-keeper-backend.fly.dev
 - **API Docs**: https://recipe-keeper-backend.fly.dev/docs
 
 ## Features ✨
